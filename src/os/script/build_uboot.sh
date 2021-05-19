@@ -17,6 +17,11 @@ StdErrPrintExit  "ee"
 GPrint "--------------------------------------"
 GPrint "UserINFO: Start to build uboot"
 GPrint "--------------------------------------"
+git clone 
+export CROSS_COMPILE=arm-linux-gnueabihf-
+export ARCH=arm
+make zynq_zyboz7_config 
+make
 
 GPrint "--------------------------------------"
 GPrint "UserINFO: Build uboot completed"
