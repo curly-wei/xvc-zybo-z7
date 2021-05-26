@@ -50,14 +50,14 @@ debug: start_msg create_odir debug_compile linking cp_sd end_msg
 release: start_msg create_odir release_compile linking cp_sd end_msg
 
 start_msg:
-	$(call GPrint,"======================================")
+	$(call GPrint,"=============================================")
 	$(call GPrint,"UserINFO: Start to build xvc_sw")
-	$(call GPrint,"======================================")
+	$(call GPrint,"=============================================")
 
 end_msg:
-	$(call GPrint,"======================================")
+	$(call GPrint,"=============================================")
 	$(call GPrint,"UserINFO: Build xvc_sw completed")
-	$(call GPrint,"======================================")
+	$(call GPrint,"=============================================")
 
 create_odir:
 	mkdir -p ${kOutputDir}

@@ -24,9 +24,9 @@ proc GStr {strs} {
   return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
-puts [GStr "======================================"]
+puts [GStr "============================================="]
 puts [GStr "UserINFO: Start to build xvc_hw"]
-puts [GStr "======================================"]
+puts [GStr "============================================="]
 
 #clean previois buildedcd folder and design
 puts [GStr "UserINFO: clear previous build objects"]
@@ -51,7 +51,7 @@ set kBDName "xvc_system"
 #Set project properties (create dummy(diskless) project)
 set kFPGAPart "xc7z010clg400-1"
 set_part ${kFPGAPart}
-#set_property BOARD_PART "tul.com.tw:pynq-z2:part0:1.0" [current_project]
+set_property BOARD_PART "digilentinc.com:zybo-z7-10:part0:1.0" [current_project]
 set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 # Regarding source_mgmt_mode, see
@@ -254,8 +254,8 @@ write_hw_platform -fixed -include_bit -force -verbose \
   "${kOutputDir}/${kBDName}_top.xsa"
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}_top.xsa"
 
-puts [GStr "======================================"]
+puts [GStr "============================================="]
 puts [GStr "UserINFO: Build xvc_hw completed"]
-puts [GStr "======================================"]
+puts [GStr "============================================="]
 
 #start_gui

@@ -12,17 +12,15 @@ function GPrint {
   printf "${kColorGreen}$1${kColorEnd}\n"
 }
 
-StdErrPrintExit  "ee"
-
-GPrint "--------------------------------------"
+GPrint "-----------------------------------------------"
 GPrint "UserINFO: Start to build uboot"
-GPrint "--------------------------------------"
+GPrint "-----------------------------------------------"
 git clone 
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 make zynq_zyboz7_config 
 make
 
-GPrint "--------------------------------------"
+GPrint "-----------------------------------------------"
 GPrint "UserINFO: Build uboot completed"
-GPrint "--------------------------------------"
+GPrint "-----------------------------------------------"

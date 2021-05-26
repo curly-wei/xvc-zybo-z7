@@ -10,9 +10,9 @@ proc GStr {strs} {
   return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
-puts [GStr "--------------------------------------"]
+puts [GStr "-----------------------------------------------"]
 puts [GStr "UserINFO: Start to Build FSBL"]
-puts [GStr "--------------------------------------"]
+puts [GStr "-----------------------------------------------"]
 
 set kAPPName "xvc_fsbl"
 set kPlatformName "${kAPPName}_pf"
@@ -21,7 +21,6 @@ set kBuildDir "[pwd]"
 set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
 set kOutputDir "${kBuildDir}/xvc_server_os/fsbl" 
 
-setws ${kOutputDir}
 puts [GStr "UserINFO: clear previous build objects"]
 file delete -force ${kOutputDir}
 
@@ -33,6 +32,7 @@ if { [file exist ${kXSAFilePath}] == 1} {
   error [RStr "UserERROR: xsa file does not exist"]
 }
 
+setws ${kOutputDir}
 puts [GStr "UserINFO: create pf"]
 platform create \
   -name ${kPlatformName} \
@@ -68,6 +68,6 @@ app build -name ${kAPPName}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
-puts [GStr "--------------------------------------"]
+puts [GStr "-----------------------------------------------"]
 puts [GStr "UserINFO: Build FSBL completed"]
-puts [GStr "--------------------------------------"]
+puts [GStr "-----------------------------------------------"]

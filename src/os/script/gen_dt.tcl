@@ -10,18 +10,45 @@ proc GStr {strs} {
   return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
-puts [GStr "--------------------------------------"]
-puts [GStr "UserINFO: Start to Build FSBL"]
-puts [GStr "--------------------------------------"]
+puts [GStr "-----------------------------------------------"]
+puts [GStr "UserINFO: Start to Generate Device Tree for xvc"]
+puts [GStr "-----------------------------------------------"]
 
-set kAPPName "xvc_fsbl"
-set kPlatformName "${kAPPName}_pf"
-set kDomainName "${kAPPName}_dom"
+set kXVCSrcTopDir [file normalize "[pwd]/../src"]
+set kXilDTRepoPath "${kXVCSrcTopDir}/os/device_tree/device-tree-xlnx"
 set kBuildDir "[pwd]"
 set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
-set kOutputDir "${kBuildDir}/xvc_server_os/fsbl" 
+set kOutputDir "${kBuildDir}/xvc_server_os/dt" 
 
+#set kXilDTRepoURL "https://github.com/Xilinx/device-tree-xlnx.git"
+#set kXilDTRepoDownloadToPath "${kOutputDir}" 
+#set kXilDTRepoPath "${kXilDTRepoDownloadToPath}/device-tree-xlnx"
 
-puts [GStr "--------------------------------------"]
-puts [GStr "UserINFO: Build FSBL completed"]
-puts [GStr "--------------------------------------"]
+puts [GStr "UserINFO: clear previous build objects"]
+file delete -force ${kOutputDir}
+
+file mkdir ${kOutputDir}
+puts [GStr "UserINFO: Set DT repositary from xilinx-git"]
+#exec git clone ${kXilDTRepoURL} ${kXilDTRepoDownloadToPath}
+hsi::set_repo_path ${kXilDTRepoPath}
+
+puts [GStr "UserINFO: check xsa file if exist"]
+if { [file exist ${kXSAFilePath}] == 1} {
+  puts [GStr "UserINFO: Found xsa file, located at:"]
+  puts [GStr [file normalize ${kXSAFilePath}] ]
+} else {
+  error [RStr "UserERROR: xsa file does not exist"]
+}
+
+puts [GStr "UserINFO: read xsa file"]
+hsi::open_hw_design ${kXSAFilePath}
+
+puts [GStr "UserINFO: create DT project from xsa file"]
+hsi::create_sw_design device-tree -os device_tree -proc ps7_cortexa9_0
+
+puts [GStr "UserINFO: Generate DT"]
+hsi::generate_target -dir ${kOutputDir}
+
+puts [GStr "-----------------------------------------------"]
+puts [GStr "UserINFO: Generate Device Tree completed"]
+puts [GStr "-----------------------------------------------"]
