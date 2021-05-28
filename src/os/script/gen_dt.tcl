@@ -20,16 +20,11 @@ set kBuildDir "[pwd]"
 set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
 set kOutputDir "${kBuildDir}/xvc_server_os/dt" 
 
-#set kXilDTRepoURL "https://github.com/Xilinx/device-tree-xlnx.git"
-#set kXilDTRepoDownloadToPath "${kOutputDir}" 
-#set kXilDTRepoPath "${kXilDTRepoDownloadToPath}/device-tree-xlnx"
-
 puts [GStr "UserINFO: clear previous build objects"]
 file delete -force ${kOutputDir}
 
 file mkdir ${kOutputDir}
 puts [GStr "UserINFO: Set DT repositary from xilinx-git"]
-#exec git clone ${kXilDTRepoURL} ${kXilDTRepoDownloadToPath}
 hsi::set_repo_path ${kXilDTRepoPath}
 
 puts [GStr "UserINFO: check xsa file if exist"]

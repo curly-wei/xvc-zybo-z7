@@ -1,8 +1,5 @@
-/dts-v1/;
-/include/ "system-conf.dtsi"
-/ {
-};
-
+// refer here
+// https://qiita.com/7of9/items/43e650f2e7d9c55da175
 &gem0 {
   #address-cells = <1>;
   phy-handle = <&phy0>;

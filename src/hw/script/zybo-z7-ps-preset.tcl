@@ -1,3 +1,7 @@
+ # About DQS of RAM
+ # Refer to here
+ # https://forum.digilentinc.com/topic/15755-ddr-issues-on-zybo-z7-20/
+
 proc getPresetInfo {} {
   return [dict create name {zyboz7_preset} description {zyboz7_preset}  vlnv xilinx.com:ip:processing_system7:5.5 display_name {zyboz7_preset} ]
 }

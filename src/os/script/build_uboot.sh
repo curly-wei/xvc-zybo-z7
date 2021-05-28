@@ -15,7 +15,11 @@ function GPrint {
 GPrint "-----------------------------------------------"
 GPrint "UserINFO: Start to build uboot"
 GPrint "-----------------------------------------------"
-git clone 
+
+uboot_remote_repo="git://git.denx.de/u-boot.git"
+uboot_branch_zybo_z7="u-boot-2017.11-zynq-zybo-z7"
+
+git clone ${uboot_remote_repo} ${uboot_branch_zybo_z7}
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 make zynq_zyboz7_config 
