@@ -14,8 +14,6 @@ puts [GStr "-----------------------------------------------"]
 puts [GStr "UserINFO: Start to Generate Device Tree for xvc"]
 puts [GStr "-----------------------------------------------"]
 
-#set kXVCSrcTopDir [file normalize "[pwd]/../src"]
-#set kXilDTRepoPath "${kXVCSrcTopDir}/os/device_tree/device-tree-xlnx"
 set kBuildDir "[pwd]"
 set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
 set kOutputDir "${kBuildDir}/xvc_server_os/dt" 
@@ -37,8 +35,6 @@ exec -ignorestderr git clone ${kDTRepoURL} ${kXilDTRepoPath}
 
 puts [GStr "UserINFO: Set DT repositary from xilinx-git"]
 hsi::set_repo_path ${kXilDTRepoPath}
-
-
 
 puts [GStr "UserINFO: check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
