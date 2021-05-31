@@ -16,14 +16,16 @@ GPrint "-----------------------------------------------"
 GPrint "UserINFO: Start to build uboot"
 GPrint "-----------------------------------------------"
 
-uboot_remote_repo="git://git.denx.de/u-boot.git"
-uboot_branch_zybo_z7="u-boot-2017.11-zynq-zybo-z7"
+uboot_remote_repo="git@github.com:u-boot/u-boot.git"
+uboot_local_dir="u-boot"
+uboot_conf_name="xilinx_zynq_virt_defconfig"
+max_jobs=12
 
-git clone ${uboot_remote_repo} ${uboot_branch_zybo_z7}
+git clone ${uboot_remote_repo} ${uboot_local_dir}
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
-make zynq_zyboz7_config 
-make
+make -f ${uboot_local_dir} ${uboot_conf_name}
+make -f ${uboot_local_dir} -j${max_jobs}
 
 GPrint "-----------------------------------------------"
 GPrint "UserINFO: Build uboot completed"

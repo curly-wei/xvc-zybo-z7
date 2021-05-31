@@ -32,7 +32,9 @@ if { [file exist ${kXSAFilePath}] == 1} {
   error [RStr "UserERROR: xsa file does not exist"]
 }
 
+puts [GStr "UserINFO: create/set work dir"]
 setws ${kOutputDir}
+
 puts [GStr "UserINFO: create pf"]
 platform create \
   -name ${kPlatformName} \

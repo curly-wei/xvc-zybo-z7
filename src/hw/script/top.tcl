@@ -259,3 +259,7 @@ puts [GStr "UserINFO: Build xvc_hw completed"]
 puts [GStr "============================================="]
 
 #start_gui
+
+# Refer to here
+# https://tinyurl.com/t45wsu4v
+# Critical warning of DDR clk to dqs seem can be ignore

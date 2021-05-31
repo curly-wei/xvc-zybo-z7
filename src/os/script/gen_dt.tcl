@@ -14,18 +14,31 @@ puts [GStr "-----------------------------------------------"]
 puts [GStr "UserINFO: Start to Generate Device Tree for xvc"]
 puts [GStr "-----------------------------------------------"]
 
-set kXVCSrcTopDir [file normalize "[pwd]/../src"]
-set kXilDTRepoPath "${kXVCSrcTopDir}/os/device_tree/device-tree-xlnx"
+#set kXVCSrcTopDir [file normalize "[pwd]/../src"]
+#set kXilDTRepoPath "${kXVCSrcTopDir}/os/device_tree/device-tree-xlnx"
 set kBuildDir "[pwd]"
 set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
 set kOutputDir "${kBuildDir}/xvc_server_os/dt" 
 
+set kDTRepoURL "https://github.com/Xilinx/device-tree-xlnx.git"
+set kDTRepoLocalDirName "device-tree-xlnx"
+set kXilDTRepoPath "${kOutputDir}/${kDTRepoLocalDirName}"
+
 puts [GStr "UserINFO: clear previous build objects"]
 file delete -force ${kOutputDir}
 
+puts [GStr "UserINFO: create work dir"]
 file mkdir ${kOutputDir}
+
+puts [GStr "UserINFO: clone dt repo from remote"]
+exec -ignorestderr git clone ${kDTRepoURL} ${kXilDTRepoPath}
+# if no "-ignorestderr" then build will be interruped,
+# because git display download message with stderr
+
 puts [GStr "UserINFO: Set DT repositary from xilinx-git"]
 hsi::set_repo_path ${kXilDTRepoPath}
+
+
 
 puts [GStr "UserINFO: check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
