@@ -22,6 +22,14 @@ systemd_out_path := ${kOutputDir}/${kSystemdFile}
 bin_install_dir := ${kInstallPrefix}/bin
 sd_install_dir := ${kInstallPrefix}/lib/systemd/system
 
+# Features of Compiler 
+XSCT ?= xsct
+XSCT_FLAGS = -eval source
+BASH ?= /bin/bash
+XSCT_FLAGS = 
+ZYNQ_BOOTGEN ?= bootgen
+ZYNQ_BOOTGEN_FLGAS = -arch zynq
+
 #Color renderning
 define GPrint 
 	@$(eval kColorRed := '\e[0;31m')

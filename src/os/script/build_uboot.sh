@@ -16,16 +16,55 @@ GPrint "-----------------------------------------------"
 GPrint "UserINFO: Start to build uboot"
 GPrint "-----------------------------------------------"
 
-uboot_remote_repo="git@github.com:u-boot/u-boot.git"
-uboot_local_dir="u-boot"
-uboot_conf_name="xilinx_zynq_virt_defconfig"
-max_jobs=12
+# IO properties
+kBuildDir="$(realpath $(pwd))"
+kOutputDir="${kBuildDir}/xvc_server_os/u-boot"
 
-git clone ${uboot_remote_repo} ${uboot_local_dir}
+# Local/Remote Repo property
+kUBootSrcRemoteRepoUrl="git@github.com:u-boot/u-boot.git"
+kUBootSrcRemoteBranchTag="master"
+kUBootSrcLocalDirName="u-boot"
+kUBootSrcLocalPath="${kBuildDir}/${kUBootSrcLocalDirName}"
+
+#Build properties
+kUbootConfName="xilinx_zynq_virt_defconfig"
+kMaxJobs="$(( $(nproc) / 2 ))" 
+
+#Output file(cp) properties
+kUBootGenFileName="u-boot"
+kUBootOutFileName="u-boot.elf"
+
+GPrint "UserINFO: clean previously build object"
+rm -rf ${kUBootSrcLocalPath} ${kOutputDir}
+
+GPrint "UserINFO: create output dir"
+mkdir -p ${kOutputDir}
+
+GPrint "UserINFO: download source code"
+git clone \
+  --depth=1 \
+  --branch=${kUBootSrcRemoteBranchTag} \
+  ${kUBootSrcRemoteRepoUrl} ${kUBootSrcLocalPath} 
+
+GPrint "UserINFO: set build envs."
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
-make -f ${uboot_local_dir} ${uboot_conf_name}
-make -f ${uboot_local_dir} -j${max_jobs}
+export MAKEFLAGS=j${kMaxJobs}
+
+GPrint "UserINFO: conf source code"
+make -C ${kUBootSrcLocalPath} ${kUbootConfName}
+
+GPrint "UserINFO: build u-boot"
+make -C ${kUBootSrcLocalPath}
+
+GPrint "UserINFO: export u-boot.elf file to output dir"
+cp "${kUBootSrcLocalPath}/${kUBootGenFileName}" \
+  "${kOutputDir}/${kUBootOutFileName}"
+
+GPrint "UserINFO: unset env"
+unset MAKEFLAGS
+unset ARCH
+unset CROSS_COMPILE
 
 GPrint "-----------------------------------------------"
 GPrint "UserINFO: Build uboot completed"

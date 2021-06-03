@@ -14,15 +14,22 @@ puts [GStr "-----------------------------------------------"]
 puts [GStr "UserINFO: Start to Build FSBL"]
 puts [GStr "-----------------------------------------------"]
 
+# IO properties
+set kXSAFilePath "[pwd]/xvc_server_hw/xvc_system_top.xsa"
+set kBuildDir "[pwd]/build_xvc_fsbl"
+set kOutputDir "[pwd]/xvc_server_os/fsbl" 
+
+#Build properties
 set kAPPName "xvc_fsbl"
 set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
-set kBuildDir "[pwd]"
-set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
-set kOutputDir "${kBuildDir}/xvc_server_os/fsbl" 
+
+#Output file(cp) properties
+set kFSBLFileName "${kAPPName}.elf"
+set kFSBLGenDir "${kBuildDir}/${kAPPName}/Debug"
 
 puts [GStr "UserINFO: clear previous build objects"]
-file delete -force ${kOutputDir}
+file delete -force ${kOutputDir} ${kBuildDir}
 
 puts [GStr "UserINFO: check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
@@ -32,8 +39,11 @@ if { [file exist ${kXSAFilePath}] == 1} {
   error [RStr "UserERROR: xsa file does not exist"]
 }
 
-puts [GStr "UserINFO: create/set work dir"]
-setws ${kOutputDir}
+puts [GStr "UserINFO: create/set work(build) dir"]
+setws ${kBuildDir}
+
+puts [GStr "UserINFO: create output dir"]
+file mkdir ${kOutputDir} 
 
 puts [GStr "UserINFO: create pf"]
 platform create \
@@ -67,6 +77,9 @@ app config \
 
 puts [GStr "UserINFO: build app"]
 app build -name ${kAPPName} 
+
+puts [GStr "UserINFO: export fsbl.elf file to output dir"]
+file copy "${kFSBLGenDir}/${kFSBLFileName}" ${kOutputDir}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
