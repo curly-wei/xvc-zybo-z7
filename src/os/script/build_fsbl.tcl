@@ -25,8 +25,9 @@ set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
 
 #Output file(cp) properties
-set kFSBLFileName "${kAPPName}.elf"
 set kFSBLGenDir "${kBuildDir}/${kAPPName}/Debug"
+set kFSBLGenFileName "${kAPPName}.elf"
+set kFSBLGenPath "${kFSBLGenDir}/${kFSBLGenFileName}"
 
 puts [GStr "UserINFO: clear previous build objects"]
 file delete -force ${kOutputDir} ${kBuildDir}
@@ -79,7 +80,7 @@ puts [GStr "UserINFO: build app"]
 app build -name ${kAPPName} 
 
 puts [GStr "UserINFO: export fsbl.elf file to output dir"]
-file copy "${kFSBLGenDir}/${kFSBLFileName}" ${kOutputDir}
+file copy ${kFSBLGenPath} ${kOutputDir}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 

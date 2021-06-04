@@ -23,7 +23,7 @@ kOutputDir="${kBuildDir}/xvc_server_os/u-boot"
 # Local/Remote Repo property
 kUBootSrcRemoteRepoUrl="git@github.com:u-boot/u-boot.git"
 kUBootSrcRemoteBranchTag="master"
-kUBootSrcLocalDirName="u-boot"
+kUBootSrcLocalDirName="build_uboot"
 kUBootSrcLocalPath="${kBuildDir}/${kUBootSrcLocalDirName}"
 
 #Build properties
@@ -33,6 +33,8 @@ kMaxJobs="$(( $(nproc) / 2 ))"
 #Output file(cp) properties
 kUBootGenFileName="u-boot"
 kUBootOutFileName="u-boot.elf"
+kUBootGenFilePath="${kUBootSrcLocalPath}/${kUBootGenFileName}"
+kUBootOutFilePath="${kOutputDir}/${kUBootOutFileName}"
 
 GPrint "UserINFO: clean previously build object"
 rm -rf ${kUBootSrcLocalPath} ${kOutputDir}
@@ -58,8 +60,7 @@ GPrint "UserINFO: build u-boot"
 make -C ${kUBootSrcLocalPath}
 
 GPrint "UserINFO: export u-boot.elf file to output dir"
-cp "${kUBootSrcLocalPath}/${kUBootGenFileName}" \
-  "${kOutputDir}/${kUBootOutFileName}"
+cp ${kUBootGenFilePath} ${kUBootOutFilePath}
 
 GPrint "UserINFO: unset env"
 unset MAKEFLAGS

@@ -23,7 +23,7 @@ kOutputDir="${kBuildDir}/xvc_server_os/kernel"
 # Local/Remote Repo property
 kKernelSrcRemoteRepoUrl="https://github.com/Xilinx/linux-xlnx.git"
 kKernelSrcRemoteBranchTag="master"
-kKernelSrcLocalDirName="linux-xlnx"
+kKernelSrcLocalDirName="build_kernel"
 kKernelSrcLocalPath="${kBuildDir}/${kKernelSrcLocalDirName}"
 
 #Build properties
@@ -34,6 +34,7 @@ kUImgLoadAddr="0x8000"
 #Output file(cp) properties
 kUImageGenDir="${kKernelSrcLocalPath}/arch/arm/boot/"
 kUImageFileName="uImage"
+kUImageGenPath="${kUImageGenDir}/${kUImageFileName}"
 
 GPrint "UserINFO: clean previously build object"
 rm -rf ${kKernelSrcLocalPath} ${kOutputDir}
@@ -66,7 +67,7 @@ make \
   ${kUImageFileName}
 
 GPrint "UserINFO: export kernel file to output dir"
-cp "${kUImageGenDir}/${kUImageFileName}" "${kOutputDir}"
+cp ${kUImageGenPath} ${kOutputDir}
 
 GPrint "UserINFO: unset env"
 unset MAKEFLAGS
