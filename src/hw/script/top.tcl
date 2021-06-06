@@ -51,7 +51,7 @@ set kBDName "xvc_system"
 #Set project properties (create dummy(diskless) project)
 set kFPGAPart "xc7z010clg400-1"
 set_part ${kFPGAPart}
-set_property BOARD_PART "digilentinc.com:zybo-z7-10:part0:1.0" [current_project]
+#set_property BOARD_PART "digilentinc.com:zybo-z7-10:part0:1.0" [current_project]
 set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
 # Regarding source_mgmt_mode, see
