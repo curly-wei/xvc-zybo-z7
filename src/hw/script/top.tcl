@@ -54,16 +54,12 @@ set_part ${kFPGAPart}
 #set_property BOARD_PART "digilentinc.com:zybo-z7-10:part0:1.0" [current_project]
 set_property TARGET_LANGUAGE Verilog [current_project]
 set_property DEFAULT_LIB work [current_project]
-# Regarding source_mgmt_mode, see
-# https://tinyurl.com/4b7xyvxs
-# and
-# https://www.xilinx.com/support/answers/69846.html
-# and
-# https://www.xilinx.com/support/answers/63488.html
-# If source_mgmt_mode hasn't set as 'All',
-# then we can't compile axi_jtage with 'source code mode',
-# axi_jtage only can be compile with 'locked ip mode'
+
 set_property source_mgmt_mode All [current_project]
+# Regarding source_mgmt_mode, see
+# doc/faq/hw_script_faq.md
+# chapter
+# 1.1 About `set_property DEFAULT_LIB work [current_project]`
 
 #Define directory of source code and IP (dirs of srcs)
 set kTopSrcsDir [file normalize "${kBuildDir}/../src/hw"]
@@ -166,8 +162,11 @@ if { [ file exists ${kTopBDScriptFile} ] == 1 } {
 }
 
 # create bd wrapper for top hw
-# synth_checkpoint_mode refer to ug994-vivado-ip-subsystem
 set_property synth_checkpoint_mode None [ get_files ${bd_file_and_path} ]
+# synth_checkpoint_mode refer to doc/faq/hw_script_faq.md
+# chapter
+# 1.2 About `set_property synth_checkpoint_mode None...
+
 generate_target all [ get_files ${bd_file_and_path} ]
 set top_bd_wrapper_name "${kBDName}_wrapper"
 set top_bd_wrapper_path \
@@ -236,20 +235,25 @@ write_debug_probes -force "${kOutputDir}/${kBDName}_top.itx"
 
 # STEP#7: Export the implemented hardware system to the Vitis environment
 #
-# Before write_hw_platform, 
-# must run 
-# open_checkpoint <post-route.dcp>
-# furthermore, can't use read_bd ${bd_file_and_path}
-# reason Refer to
-# https://www.xilinx.com/support/answers/60945.html
 #
 puts [GStr "UserINFO: Genetrate xsa File"]
 open_checkpoint "${kOutputDir}/post_route.dcp"
+# Regarding ``open_checkpoint "${kOutputDir}/post_route.dcp"
+# see
+# doc/faq/hw_script_faq.md
+# Chapter
+# 1.3 About `open_checkpoint <post-route.dcp>`
+
 set_property platform.design_intent.embedded true [current_project]
 set_property platform.design_intent.server_managed false [current_project]
 set_property platform.design_intent.external_host false [current_project]
 set_property platform.design_intent.datacenter false [current_project]
 set_property platform.default_output_type "sd_card" [current_project]
+# Regarding 
+# set_property platform...
+# Chapter 
+# 1.5 About `set_property platform.design_intent...`
+
 write_hw_platform -fixed -include_bit -force -verbose \
   "${kOutputDir}/${kBDName}_top.xsa"
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}_top.xsa"
@@ -261,5 +265,7 @@ puts [GStr "============================================="]
 #start_gui
 
 # Refer to here
-# https://tinyurl.com/t45wsu4v
-# Critical warning of DDR clk to dqs seem can be ignore
+# doc/faq/hw_script_faq.md
+# Chapter
+# 1.4 About `Critical warning of DDR clk to dqs seem can be ignore` 
+
