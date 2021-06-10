@@ -6,15 +6,15 @@ function StdErrPrintExit {
   exit
 } 
 
-function GPrint {
+function InfoPrint {
   local kColorGreen='\x1b[0;32m'
   local kColorEnd='\x1b[0m'
-  printf "${kColorGreen}$1${kColorEnd}\n"
+  printf "UserINFO: ${kColorGreen}$1${kColorEnd}\n"
 }
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Start to build uboot"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Start to build uboot"
+InfoPrint "-----------------------------------------------"
 
 # IO properties
 kBuildDir="$(realpath $(pwd))"
@@ -36,37 +36,37 @@ kUBootOutFileName="u-boot.elf"
 kUBootGenFilePath="${kUBootSrcLocalPath}/${kUBootGenFileName}"
 kUBootOutFilePath="${kOutputDir}/${kUBootOutFileName}"
 
-GPrint "UserINFO: clean previously build object"
+InfoPrint "clean previously build object"
 rm -rf ${kUBootSrcLocalPath} ${kOutputDir}
 
-GPrint "UserINFO: create output dir"
+InfoPrint "create output dir"
 mkdir -p ${kOutputDir}
 
-GPrint "UserINFO: download source code"
+InfoPrint "download source code"
 git clone \
   --depth=1 \
   --branch=${kUBootSrcRemoteBranchTag} \
   ${kUBootSrcRemoteRepoUrl} ${kUBootSrcLocalPath} 
 
-GPrint "UserINFO: set build envs."
+InfoPrint "set build envs."
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 export MAKEFLAGS=j${kMaxJobs}
 
-GPrint "UserINFO: conf source code"
+InfoPrint "conf source code"
 make -C ${kUBootSrcLocalPath} ${kUbootConfName}
 
-GPrint "UserINFO: build u-boot"
+InfoPrint "build u-boot"
 make -C ${kUBootSrcLocalPath}
 
-GPrint "UserINFO: export u-boot.elf file to output dir"
+InfoPrint "export u-boot.elf file to output dir"
 cp ${kUBootGenFilePath} ${kUBootOutFilePath}
 
-GPrint "UserINFO: unset env"
+InfoPrint "unset env"
 unset MAKEFLAGS
 unset ARCH
 unset CROSS_COMPILE
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Build uboot completed"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Build uboot completed"
+InfoPrint "-----------------------------------------------"

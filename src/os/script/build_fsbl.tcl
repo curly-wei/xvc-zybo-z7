@@ -1,18 +1,18 @@
 # Founction Redering string output
-proc RStr {strs} {
+proc ErrStr {strs} {
   set kColorRBegin "\x1b\[1;31m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorRBegin}${strs}${kColorEnd}"
+  return "UserERROR: ${kColorRBegin}${strs}${kColorEnd}"
 }
-proc GStr {strs} {
+proc InfoStr {strs} {
   set kColorGBegin "\x1b\[1;32m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorGBegin}${strs}${kColorEnd}"
+  return "UserINFO: ${kColorGBegin}${strs}${kColorEnd}"
 }
 
-puts [GStr "-----------------------------------------------"]
-puts [GStr "UserINFO: Start to Build FSBL"]
-puts [GStr "-----------------------------------------------"]
+puts [InfoStr "-----------------------------------------------"]
+puts [InfoStr "Start to Build FSBL"]
+puts [InfoStr "-----------------------------------------------"]
 
 # IO properties
 set kXSAFilePath "[pwd]/xvc_server_hw/xvc_system_top.xsa"
@@ -29,61 +29,61 @@ set kFSBLGenDir "${kBuildDir}/${kAPPName}/Debug"
 set kFSBLGenFileName "${kAPPName}.elf"
 set kFSBLGenPath "${kFSBLGenDir}/${kFSBLGenFileName}"
 
-puts [GStr "UserINFO: clear previous build objects"]
+puts [InfoStr "clear previous build objects"]
 file delete -force ${kOutputDir} ${kBuildDir}
 
-puts [GStr "UserINFO: check xsa file if exist"]
+puts [InfoStr "check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
-  puts [GStr "UserINFO: Found xsa file, located at:"]
-  puts [GStr [file normalize ${kXSAFilePath}] ]
+  puts [InfoStr "Found xsa file, located at:"]
+  puts [InfoStr [file normalize ${kXSAFilePath}] ]
 } else {
-  error [RStr "UserERROR: xsa file does not exist"]
+  error [ErrStr "xsa file does not exist"]
 }
 
-puts [GStr "UserINFO: create/set work(build) dir"]
+puts [InfoStr "create/set work(build) dir"]
 setws ${kBuildDir}
 
-puts [GStr "UserINFO: create output dir"]
+puts [InfoStr "create output dir"]
 file mkdir ${kOutputDir} 
 
-puts [GStr "UserINFO: create pf"]
+puts [InfoStr "create pf"]
 platform create \
   -name ${kPlatformName} \
   -hw ${kXSAFilePath}
 
 
-puts [GStr "UserINFO: create domain"]
+puts [InfoStr "create domain"]
 domain create \
   -name ${kDomainName} \
   -os standalone \
   -proc ps7_cortexa9_0
 
-puts [GStr "UserINFO: set bsplib xilffs"]
+puts [InfoStr "set bsplib xilffs"]
 bsp setlib xilffs
 
-puts [GStr "UserINFO: generate pf"]
+puts [InfoStr "generate pf"]
 platform generate
 
-puts [GStr "UserINFO: create app"]
+puts [InfoStr "create app"]
 app create \
   -name ${kAPPName} \
   -platform ${kPlatformName} \
   -domain ${kDomainName} \
   -template {Zynq FSBL} 
 
-puts [GStr "UserINFO: conf app"]
+puts [InfoStr "conf app"]
 app config \
   -name ${kAPPName} \
   define-compiler-symbols {FSBL_DEBUG_INFO}
 
-puts [GStr "UserINFO: build app"]
+puts [InfoStr "build app"]
 app build -name ${kAPPName} 
 
-puts [GStr "UserINFO: export fsbl.elf file to output dir"]
+puts [InfoStr "export fsbl.elf file to output dir"]
 file copy ${kFSBLGenPath} ${kOutputDir}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
-puts [GStr "-----------------------------------------------"]
-puts [GStr "UserINFO: Build FSBL completed"]
-puts [GStr "-----------------------------------------------"]
+puts [InfoStr "-----------------------------------------------"]
+puts [InfoStr "Build FSBL completed"]
+puts [InfoStr "-----------------------------------------------"]

@@ -1,8 +1,11 @@
 # XVC for zybo-z7
 
-Refer to Xilinx official documentation: [Xiilnx Virtual Cable(XVC)](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_2/ug973-vivado-release-notes-install-license.pdf) .
+Refer to Xilinx official documentation:
+[Xiilnx Virtual Cable(XVC)](https://tinyurl.com/335zc6x5),
 
-I'd like to make a similar one for [Digilent zybo-z7 development board](https://reference.digilentinc.com/programmable-logic/zybo-z7/start) with [non project TCL mode (page 22)](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_2/ug892-vivado-design-flows-overview.pdf).
+I'd like to make a similar one for
+[Digilent zybo-z7 development board](https://tinyurl.com/yrc5k3ux)
+with [non project TCL mode (page 22)](https://tinyurl.com/4t8c6eux).
 
 ## 1 How to build
 

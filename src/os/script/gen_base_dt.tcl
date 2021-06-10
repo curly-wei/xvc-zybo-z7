@@ -1,18 +1,18 @@
 # Founction Redering string output
-proc RStr {strs} {
+proc ErrStr {strs} {
   set kColorRBegin "\x1b\[1;31m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorRBegin}${strs}${kColorEnd}"
+  return "UserERROR: ${kColorRBegin}${strs}${kColorEnd}"
 }
-proc GStr {strs} {
+proc InfoStr {strs} {
   set kColorGBegin "\x1b\[1;32m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorGBegin}${strs}${kColorEnd}"
+  return "UserINFO: ${kColorGBegin}${strs}${kColorEnd}"
 }
 
-puts [GStr "-----------------------------------------------"]
-puts [GStr "UserINFO: Start to Generate Device Tree for xvc"]
-puts [GStr "-----------------------------------------------"]
+puts [InfoStr "-----------------------------------------------"]
+puts [InfoStr "Start to Generate Device Tree for xvc"]
+puts [InfoStr "-----------------------------------------------"]
 
 # IO properties
 set kXSAFilePath "[pwd]/xvc_server_hw/xvc_system_top.xsa"
@@ -27,16 +27,16 @@ set kXilDTSrcLocalDirName "device-tree-xlnx"
 set kXilDTSrcRemoteBranchTag "master"
 set kXilDTSrcLocalPath "${kBuildDir}/${kXilDTSrcLocalDirName}"
 
-puts [GStr "UserINFO: clear previous build objects"]
+puts [InfoStr "clear previous build objects"]
 file delete -force ${kBuildDir} ${kBaseDTGenDir}
 
-puts [GStr "UserINFO: create work(build) dir"]
+puts [InfoStr "create work(build) dir"]
 file mkdir ${kBuildDir}
 
-puts [GStr "UserINFO: create output dir"]
+puts [InfoStr "create output dir"]
 file mkdir ${kBaseDTGenDir}
 
-puts [GStr "UserINFO: clone dt repo from remote"]
+puts [InfoStr "clone dt repo from remote"]
 exec -ignorestderr \
   git clone \
   --depth=1 \
@@ -45,26 +45,26 @@ exec -ignorestderr \
 # if no "-ignorestderr" then build will be interruped,
 # because git display download message with stderr
 
-puts [GStr "UserINFO: Set DT repositary from xilinx-git"]
+puts [InfoStr "Set DT repositary from xilinx-git"]
 hsi::set_repo_path ${kXilDTSrcLocalPath}
 
-puts [GStr "UserINFO: check xsa file if exist"]
+puts [InfoStr "check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
-  puts [GStr "UserINFO: Found xsa file, located at:"]
-  puts [GStr [file normalize ${kXSAFilePath}] ]
+  puts [InfoStr "Found xsa file, located at:"]
+  puts [InfoStr [file normalize ${kXSAFilePath}] ]
 } else {
-  error [RStr "UserERROR: xsa file does not exist"]
+  error [ErrStr "xsa file does not exist"]
 }
 
-puts [GStr "UserINFO: read xsa file"]
+puts [InfoStr "read xsa file"]
 hsi::open_hw_design ${kXSAFilePath}
 
-puts [GStr "UserINFO: create DT project from xsa file"]
+puts [InfoStr "create DT project from xsa file"]
 hsi::create_sw_design device-tree -os device_tree -proc ps7_cortexa9_0
 
-puts [GStr "UserINFO: Generate DT"]
+puts [InfoStr "Generate DT"]
 hsi::generate_target -dir ${kBaseDTGenDir}
 
-puts [GStr "-----------------------------------------------"]
-puts [GStr "UserINFO: Generate Device Tree completed"]
-puts [GStr "-----------------------------------------------"]
+puts [InfoStr "-----------------------------------------------"]
+puts [InfoStr "Generate Device Tree completed"]
+puts [InfoStr "-----------------------------------------------"]

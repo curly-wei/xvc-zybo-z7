@@ -24,18 +24,10 @@ sd_install_dir := ${kInstallPrefix}/lib/systemd/system
 
 #Color renderning
 define GPrint 
-	@$(eval kColorRed := '\e[0;31m')
 	@$(eval kColorGreen := '\e[0;32m')
 	@$(eval kColorEnd := '\e[0m')
 	@echo -e $(kColorGreen)${1}$(kColorEnd)
 endef
-# Process compilations
-.PHONY:\
-	start_msg, end_msg,\
-	create_odir, clean,\
-	cp_sd,\
-	debug, release, linking, debug_compile, release_compile,\
-	install, uninstall
 
 default: debug
 debug: start_msg create_odir debug_compile linking cp_sd end_msg
@@ -48,7 +40,7 @@ start_msg:
 
 end_msg:
 	$(call GPrint,"=============================================")
-	$(call GPrint,"UserINFO: Build xvc_sw completed")
+	$(call GPrint,"UserERROR: Build xvc_sw completed")
 	$(call GPrint,"=============================================")
 
 create_odir:
@@ -78,3 +70,18 @@ install: cp_sd, linking
 uninstall:
 	rm -f ${bin_install_dir}/${kTarget}
 	rm -f ${sd_install_dir}/${kSystemdFile}
+
+
+# Process compilations
+.PHONY: \
+	start_msg \
+	end_msg \
+	create_odir \
+	clean \
+	cp_sd \
+	debug \
+	release \
+	linking \
+	debug_compile \
+	release_compile \
+	install uninstall

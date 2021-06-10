@@ -6,15 +6,15 @@ function StdErrPrintExit {
   exit
 } 
 
-function GPrint {
+function InfoPrint {
   local kColorGreen='\x1b[0;32m'
   local kColorEnd='\x1b[0m'
-  printf "${kColorGreen}$1${kColorEnd}\n"
+  printf "UserINFO: ${kColorGreen}$1${kColorEnd}\n"
 }
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Start to build kernel"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Start to build kernel"
+InfoPrint "-----------------------------------------------"
 
 # IO properties
 kBuildDir="$(realpath $(pwd))"
@@ -36,45 +36,45 @@ kUImageGenDir="${kKernelSrcLocalPath}/arch/arm/boot/"
 kUImageFileName="uImage"
 kUImageGenPath="${kUImageGenDir}/${kUImageFileName}"
 
-GPrint "UserINFO: clean previously build object"
+InfoPrint "clean previously build object"
 rm -rf ${kKernelSrcLocalPath} ${kOutputDir}
 
-GPrint "UserINFO: create output dir"
+InfoPrint "create output dir"
 mkdir -p ${kOutputDir}
 
-GPrint "UserINFO: download source code"
+InfoPrint "download source code"
 git clone \
   --depth=1 \
   --branch=${kKernelSrcRemoteBranchTag} \
   ${kKernelSrcRemoteRepoUrl} ${kKernelSrcLocalPath}
 
-GPrint "UserINFO: set build envs."
+InfoPrint "set build envs."
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 export INSTALL_PATH=${kOutputDir}
 export MAKEFLAGS=j${kMaxJobs}
 
-GPrint "UserINFO: conf source code"
+InfoPrint "conf source code"
 make -C ${kKernelSrcLocalPath} ${kKernelConfName}
 
-GPrint "UserINFO: build kernel"
+InfoPrint "build kernel"
 make -C ${kKernelSrcLocalPath}
 
-GPrint "UserINFO: generate uImage from build kernel"
+InfoPrint "generate uImage from build kernel"
 make \
   -C ${kKernelSrcLocalPath} \
   UIMAGE_LOADADDR=${kUImgLoadAddr} \
   ${kUImageFileName}
 
-GPrint "UserINFO: export kernel file to output dir"
+InfoPrint "export kernel file to output dir"
 cp ${kUImageGenPath} ${kOutputDir}
 
-GPrint "UserINFO: unset env"
+InfoPrint "unset env"
 unset MAKEFLAGS
 unset INSTALL_PATH
 unset ARCH
 unset CROSS_COMPILE
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Build kernel completed"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Build kernel completed"
+InfoPrint "-----------------------------------------------"

@@ -6,15 +6,15 @@ function StdErrPrintExit {
   exit
 } 
 
-function GPrint {
+function InfoPrint {
   local kColorGreen='\x1b[0;32m'
   local kColorEnd='\x1b[0m'
-  printf "${kColorGreen}$1${kColorEnd}\n"
+  printf "UserINFO: ${kColorGreen}$1${kColorEnd}\n"
 }
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Start to build busybox"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Start to build busybox"
+InfoPrint "-----------------------------------------------"
 
 # IO properties
 kBuildDir="$(realpath $(pwd))"
@@ -34,33 +34,33 @@ kMaxJobs="$(( $(nproc) / 2 ))"
 kBusyboxGenFsDirName="_install"
 kBusyboxGenFsDirPath="${kBusyboxSrcLocalPath}/${kBusyboxGenFsDirName}"
 
-GPrint "UserINFO: clean previously build object"
+InfoPrint "clean previously build object"
 rm -rf ${kBusyboxSrcLocalPath} ${kOutputDir}
 
-GPrint "UserINFO: create output dir"
+InfoPrint "create output dir"
 mkdir -p ${kOutputDir}
 
-GPrint "UserINFO: download source code"
+InfoPrint "download source code"
 git clone \
   --depth=1 \
   --branch=${kBusyboxSrcRemoteBranchTag} \
   ${kBusyboxSrcRemoteRepoUrl} ${kBusyboxSrcLocalPath}
 
-GPrint "UserINFO: set build envs."
+InfoPrint "set build envs."
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 export MAKEFLAGS=j${kMaxJobs}
 
-GPrint "UserINFO: conf source code"
+InfoPrint "conf source code"
 make -C ${kBusyboxSrcLocalPath} ${kBusyboxConfName}
 
-GPrint "UserINFO: build busybox"
+InfoPrint "build busybox"
 make -C ${kBusyboxSrcLocalPath}
 
-GPrint "UserINFO: generate busybox root dir"
+InfoPrint "generate busybox root dir"
 make -C ${kBusyboxSrcLocalPath} install
 
-GPrint "UserINFO: create some sys dir for busybox root dir"
+InfoPrint "create some sys dir for busybox root dir"
 mkdir -p\
   "${kBusyboxGenFsDirPath}/etc/rc.d" \
   "${kBusyboxGenFsDirPath}/var/log" \
@@ -75,14 +75,14 @@ mkdir -p\
   "${kBusyboxGenFsDirPath}/dev" \
   "${kBusyboxGenFsDirPath}/lib"
 
-GPrint "UserINFO: export busybox root dir to output dir"
+InfoPrint "export busybox root dir to output dir"
 cp -r "${kBusyboxGenFsDirPath}" ${kOutputDir}
 
-GPrint "UserINFO: unset env"
+InfoPrint "unset env"
 unset MAKEFLAGS
 unset ARCH
 unset CROSS_COMPILE
 
-GPrint "-----------------------------------------------"
-GPrint "UserINFO: Build busybox completed"
-GPrint "-----------------------------------------------"
+InfoPrint "-----------------------------------------------"
+InfoPrint "Build busybox completed"
+InfoPrint "-----------------------------------------------"

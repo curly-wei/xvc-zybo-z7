@@ -16,20 +16,20 @@ set kOutputDir "${kBuildDir}/xvc_server_hw"
 proc RStr {strs} {
   set kColorRBegin "\x1b\[1;31m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorRBegin}${strs}${kColorEnd}"
+  return "UserError: ${kColorRBegin}${strs}${kColorEnd}"
 }
 proc GStr {strs} {
   set kColorGBegin "\x1b\[1;32m"
   set kColorEnd "\x1b\[0m"
-  return "${kColorGBegin}${strs}${kColorEnd}"
+  return "UserINFO: ${kColorGBegin}${strs}${kColorEnd}"
 }
 
 puts [GStr "============================================="]
-puts [GStr "UserINFO: Start to build xvc_hw"]
+puts [GStr "Start to build xvc_hw"]
 puts [GStr "============================================="]
 
 #clean previois buildedcd folder and design
-puts [GStr "UserINFO: clear previous build objects"]
+puts [GStr "clear previous build objects"]
 set kVivadoDefaultGenOutFolders [ \
   list \
   "${kBuildDir}/.srcs" \
@@ -91,7 +91,7 @@ proc NumThreadsRun {} {
 }
 
 set_param general.maxThreads [NumThreadsRun]
-puts [GStr "UserINFO: Max threads = [get_param general.maxThreads]"]
+puts [GStr "Max threads = [get_param general.maxThreads]"]
 
 ## STEP#1: setup design sources and constraints
 #
@@ -100,7 +100,7 @@ foreach dirs ${kVerilogSrcDirs} {
   set verilog_files [glob -nocomplain "${dirs}/*.v" ]
   if { ${verilog_files} != "" } {
     read_verilog ${verilog_files}
-    puts [GStr "UserINFO: read-in src-verilog files: \n${verilog_files}"]
+    puts [GStr "read-in src-verilog files: \n${verilog_files}"]
   } 
 }
 
@@ -109,7 +109,7 @@ foreach dirs ${kXDCSrcDirs} {
   set xdc_files [glob -nocomplain "${dirs}/*.xdc" ]
   if { ${xdc_files} != "" } {
     read_xdc ${xdc_files}
-    puts [GStr "UserINFO: read-in xdc files: \n${xdc_files}"]
+    puts [GStr "read-in xdc files: \n${xdc_files}"]
   }
 }
 
@@ -120,7 +120,7 @@ foreach dirs ${kIPSrcDirs} {
   if { ${ip_files} != "" } {
     read_ip ${ip_files}
     set ${has_ip_files} 1
-    puts [GStr "UserINFO: read-in ip files: \n${ip_files}"]
+    puts [GStr "read-in ip files: \n${ip_files}"]
   }
 }
 
@@ -134,11 +134,11 @@ if { ${has_ip_files} == 1 } {
 #
 # Load ps preset
 if { [ file exists ${kPSPresetFile} ] == 1 } {
-  puts [GStr "UserINFO: read-in files for ps preset: \n${kPSPresetFile}"]
+  puts [GStr "read-in files for ps preset: \n${kPSPresetFile}"]
   source ${kPSPresetFile}
 } else {
   error [ RStr
-    "UserERROR: read-in files for ps preset: < ${kPSPresetFile} > fail. \
+    "read-in files for ps preset: < ${kPSPresetFile} > fail. \
     This file is necessary, please check again\
   "]  
     
@@ -148,7 +148,7 @@ if { [ file exists ${kPSPresetFile} ] == 1 } {
 if { [ file exists ${kTopBDScriptFile} ] == 1 } {
   # read-in bd-created shell and execute it
   puts [GStr \
-    "UserINFO: read-in files for top xvc-bd file: \n ${kTopBDScriptFile}"]
+    "read-in files for top xvc-bd file: \n ${kTopBDScriptFile}"]
   source ${kTopBDScriptFile}
   init_xcv_system_bd ${kBDName}
   create_root_design ""
@@ -156,7 +156,7 @@ if { [ file exists ${kTopBDScriptFile} ] == 1 } {
   set bd_file_and_path ".srcs/sources_1/bd/${kBDName}/${kBDName}.bd" 
 } else {
   error [RStr "
-    UserERROR: read-in files for ps preset: < ${kTopBDScriptFile} > fail. \
+    read-in files for ps preset: < ${kTopBDScriptFile} > fail. \
     This file is necessary, please check again\
   "]
 }
@@ -172,7 +172,7 @@ set top_bd_wrapper_name "${kBDName}_wrapper"
 set top_bd_wrapper_path \
   "${kBuildDir}/.gen/sources_1/bd/${kBDName}/hdl/${top_bd_wrapper_name}.v"
 puts [GStr \
-  "UserINFO: read-in xvc-bd-wrapper-hdl file: \n${top_bd_wrapper_path}"]
+  "read-in xvc-bd-wrapper-hdl file: \n${top_bd_wrapper_path}"]
 read_verilog ${top_bd_wrapper_path}
 
 # STEP#3: 
@@ -183,11 +183,11 @@ read_verilog ${top_bd_wrapper_path}
 # See
 # https://www.xilinx.com/support/answers/51688.html
 #
-puts [GStr "UserINFO: Run Synthesis"]
+puts [GStr "Run Synthesis"]
 reorder_files -auto
 synth_design -top ${top_bd_wrapper_name} -part ${kFPGAPart} -flatten rebuilt 
 
-puts [GStr "UserINFO: Genetrate dcp/Report for Synthesis"]
+puts [GStr "Genetrate dcp/Report for Synthesis"]
 write_checkpoint -force "${kOutputDir}/post_synth.dcp"
 report_timing_summary -file "${kOutputDir}/post_synth_timing_summary.rpt"
 report_power -file "${kOutputDir}/post_synth_power.rpt"
@@ -197,12 +197,12 @@ report_compile_order -file "${kOutputDir}/post_synth_compile_order.rpt"
 # run placement and logic optimzation, 
 # report utilization and timing estimates, write checkpoint design
 #
-puts [GStr "UserINFO: Run Implementions"]
+puts [GStr "Run Implementions"]
 opt_design
 place_design
 phys_opt_design
 
-puts [GStr "UserINFO: Genetrate dcp/Report for Implementions"]
+puts [GStr "Genetrate dcp/Report for Implementions"]
 #write_checkpoint -force "${kOutputDir}/post_place"
 report_timing_summary -file "${kOutputDir}/post_place_timing_summary.rpt"
 
@@ -210,11 +210,11 @@ report_timing_summary -file "${kOutputDir}/post_place_timing_summary.rpt"
 # run router, report actual utilization and timing, 
 # write checkpoint design, run drc, write verilog and xdc out
 #
-puts [GStr "UserINFO: Run Route"]
+puts [GStr "Run Route"]
 route_design
 write_checkpoint -force "${kOutputDir}/post_route"
 
-puts [GStr "UserINFO: Genetrate dcp/Report for Route"]
+puts [GStr "Genetrate dcp/Report for Route"]
 report_timing_summary -file "${kOutputDir}/post_route_timing_summary.rpt"
 report_timing -sort_by group -max_paths 100 -path_type summary -file \
   "${kOutputDir}/post_route_timing.rpt"
@@ -223,20 +223,20 @@ report_utilization -file "${kOutputDir}/post_route_util.rpt"
 report_power -file "${kOutputDir}/post_route_power.rpt"
 report_drc -file "${kOutputDir}/post_imp_drc.rpt"
 
-puts [GStr "UserINFO: Genetrate Summrized xdc/hdl file"]
+puts [GStr "Genetrate Summrized xdc/hdl file"]
 write_verilog -force "${kOutputDir}/${kBDName}_top_impl_netlist.v"
 write_xdc -no_fixed_only -force "${kOutputDir}/${kBDName}_top_impl.xdc"
 
 # STEP#6: generate a bitstream
 # 
-puts [GStr "UserINFO: Genetrate Bitstream and debug info"]
+puts [GStr "Genetrate Bitstream and debug info"]
 write_bitstream -force "${kOutputDir}/${kBDName}_top.bit"
 write_debug_probes -force "${kOutputDir}/${kBDName}_top.itx"
 
 # STEP#7: Export the implemented hardware system to the Vitis environment
 #
 #
-puts [GStr "UserINFO: Genetrate xsa File"]
+puts [GStr "Genetrate xsa File"]
 open_checkpoint "${kOutputDir}/post_route.dcp"
 # Regarding ``open_checkpoint "${kOutputDir}/post_route.dcp"
 # see
@@ -259,7 +259,7 @@ write_hw_platform -fixed -include_bit -force -verbose \
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}_top.xsa"
 
 puts [GStr "============================================="]
-puts [GStr "UserINFO: Build xvc_hw completed"]
+puts [GStr "Build xvc_hw completed"]
 puts [GStr "============================================="]
 
 #start_gui
