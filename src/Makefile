@@ -1,31 +1,17 @@
-#Color renderning Green
-define GPrint 
-	@$(eval kColorGreen := '\e[0;32m')
-	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)${1}$(kColorEnd)
-endef
+BUILD_DIR ?= $(shell pwd)
+PROJ_ROOT_DIR ?= $(shell realpath "${BUILD_DIR}/../")
 
-#Color renderning Red
-define RPrint 
-	@$(eval kColorRed := '\e[0;31m')
-	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)${1}$(kColorEnd)
-endef
+# Srcs Dirs
+kSrcDir := ${PROJ_ROOT_DIR}/src
+kSrcDirHw := ${PROJ_ROOT_DIR}/src/hw
+kSrcDirSw := ${PROJ_ROOT_DIR}/src/sw
+kSrcDirOs := ${PROJ_ROOT_DIR}/src/os
 
-kBuildDir ?= $(shell pwd)
-kProjRootDir := $(shell realpath "${kBuildDir}/../")
-
-# Srcs property
-kSrcDir := ${kProjRootDir}/src
-kSrcDirHw := ${kProjRootDir}/src/hw
-kSrcDirSw := ${kProjRootDir}/src/sw
-kSrcDirOs := ${kProjRootDir}/src/os
-
-# Output property
-kOutDir := ${kBuildDir}
-kOutDirHw := ${kBuildDir}/out/hw
-kOutDirSw := ${kBuildDir}/out/sw
-kOutDirOs := ${kBuildDir}/out/os
+# Output Dirs
+kOutDir := ${BUILD_DIR}
+kOutDirHw := ${BUILD_DIR}/out/hw
+kOutDirSw := ${BUILD_DIR}/out/sw
+kOutDirOs := ${BUILD_DIR}/out/os
 
 kOutDirOsFSBL := ${kOutDirOs}/fsbl
 kOutDirOsDT := ${kOutDirOs}/dt
@@ -33,65 +19,114 @@ kOutDirOsKernel := ${kOutDirOs}/kernel
 kOutDirOsUboot := ${kOutDirOs}/uboot
 kOutDirOsRootFs := ${kOutDirOs}/rootfs
 
-# Build Dir
-kBuildHwDir := ${kBuildDir}/build_hw
-kBuildSwDir := ${kBuildDir}/build_sw
-kBuildOSFSBLDir := ${kBuildDir}/build_os/fsbl
-kBuildOSDTDir := ${kBuildDir}/build_os/dt
-kBuildOSKernelDir := ${kBuildDir}/build_os/kernel
-kBuildOSUBootDir := ${kBuildDir}/build_os/uboot
-kBuildOSURootFSDir := ${kBuildDir}/build_os/rootfs
+# Build Dirs
+kBuildDirHw := ${BUILD_DIR}/build_hw
+kBuildDirSw := ${BUILD_DIR}/build_sw
+kBuildDirOSFSBL := ${BUILD_DIR}/build_os/fsbl
+kBuildDirOSDT := ${BUILD_DIR}/build_os/dt
+kBuildDirOSKernel := ${BUILD_DIR}/build_os/kernel
+kBuildDirOSUBoot := ${BUILD_DIR}/build_os/uboot
+kBuildDirOSURootFS := ${BUILD_DIR}/build_os/rootfs
 
-# Path to top-build-script and its args
-kHwTopTclScriptPath := ${kSrcDirHw}/script/top.tcl
-kHwTopTclScriptArgs := 
+# Compilers and its Common flags
+VIVADO_CLI ?= vivado
+kVividoBuildHwCommFlags := -mode batch -notrace
 
-kOsBuildFSBLScriptPath := ${kSrcDirOs}/script/build_fsbl.tcl
-kOsBuildFSBLScriptArgs :=
+XSCT_CLI ?= xsct
+kXsctCommFlags :=
 
-kOsGenBaseDtScriptPath := ${kSrcDirOs}/script/gen_base_dt.tcl
-kOsGenBaseDtScriptArgs :=
+kXsctBuildFSBLCommFlags := source
+kXsctGenBaseDTCommFlags := source
 
-# Compilers
-kVividoTclTool := vivado
-kkVividoCommFlags := -mode batch
+CROSS_COMPILE ?= arm-linux-gnueabihf-
+ARCH ?= arm
 
-kVitisXsctTool := xsct
-kVitisXsctCommFlags :=
-
-kVividoGenHwFlags := -source ${kHwTopTclScript}
-
-kVitisXsctBuildFSBLFlags := source ${kOsBuildFSBLScriptPath}
-kVitisXsctGenBaseDTFlags := source ${kOsGenBaseDtScriptPath}
-
-# Cross platform GCC toolchain
-CROSS_COMPILE ?= "arm-linux-gnueabihf-"
-ARCH ?= "arm"
-
-# hw srcs
-kHwHDLSrcsDir := ${kSrcDirHw}/hdl
+# property for build hw
+FPGA_PART ?= xc7z010clg400-1
+RUN_GUI_AFTER_BULD_HW ?= false
+kTCLUtilitiesTopPath := ${kSrcDir}/utilities
+kHwBuildScriptSrcsDir := ${kSrcDirHw}/script
 kHwXDCSrcsDir := ${kSrcDirHw}/xdc
+kHwVerilogSrcsDir := ${kSrcDirHw}/hdl
 
-kHwHDLSrcs += 
-kHwXDCSrcs += 
+kHwTargetName := xvc_server_hw
+kHwBuildScriptBD := bd_system.tcl
+kHwBuildScriptPSPreset := zybo-z7-ps-preset.tcl
+kHwXDCSrcs += xvc-zybo-z7.xdc
+kHwVerilogSrcs += axi_jtag_v1_0.v axi4_lite_if.v jtag_proc.v
 
-# hw main output target file
-kHwOutTarget := xvc_server_top.xsa
+kHwTopTclScriptPath := ${kHwBuildScriptSrcsDir}/top.tcl
+kHwBuildScriptBDPath := ${kHwBuildScriptSrcsDir}/${kHwBuildScriptBD}
+kHwBuildScriptPSPresetPath := ${kHwBuildScriptSrcsDir}/${kHwBuildScriptPSPreset}
+kHwXDCSrcsPath := \
+	$(foreach i, ${kHwXDCSrcs}, $(addprefix ${kHwXDCSrcsDir}/,${i} ) )
+kHwVerilogSrcsPath := \
+	$(foreach i, ${kHwVerilogSrcs}, $(addprefix ${kHwVerilogSrcsDir}/,${i} ) )
 
+kHwOutTarget := ${kHwTargetName}.xsa
+
+# property for build sw
+kSwBuildScriptDir := ${kSrcDirSw}
+kSwCSrcsDir := ${kSrcDirSw}
+
+kSwBuildScriptPath += ${kSwBuildScriptDir}/Makefile
+kSwCSrcs += xvc_server.c xvc_server.h xvc_server_param.h
+kSwCSrcsPath:= \
+	$(foreach i, ${kSwCSrcs}, $(addprefix ${kSwCSrcsDir}/ ,${i} ) )
+kSwSrcs := ${kSwCSrcs} ${kSwBuildScriptPath}
+
+kSwOutTarget := xvc_server.elf
 
 # Check build env
-necessary_exec_prog := ${kVividoTclTool} ${kVitisXsctTool} ${CROSS_COMPILE}gcc
+necessary_exec_prog := ${VIVADO_CLI} ${CROSS_COMPILE}gcc ${XSCT_CLI}
 chk_env := $(foreach exec,$(necessary_exec_prog),\
-	$(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
+	$(if $(shell which $(exec)),"Found $(exec); ",$(error "No $(exec) in PATH")))
 
-# Build script
+#############
+# All build #
+#############
 
-# Build hw
+build_hw: clean_hw init_hw ${kHwOutTarget}
+${kHwOutTarget}: \
+	${kHwTopTclScriptPath} \
+	${kHwBuildScriptBDPath} \
+	${kHwBuildScriptPSPresetPath} \
+	${kHwXDCSrcsPath} \
+	${kHwVerilogSrcsPath}
+		${VIVADO_CLI} ${kVividoBuildHwCommFlags} \
+		-source ${kHwTopTclScriptPath} -tclargs \
+		-O ${kOutDirHw} \
+		-B ${kBuildDirHw} \
+		-t ${kHwTargetName} \
+		-f ${FPGA_PART} \
+		-v "${kHwVerilogSrcsPath}" \
+		-x "${kHwXDCSrcsPath}" \
+		-b ${kHwBuildScriptBDPath} \
+		-p ${kHwBuildScriptPSPresetPath} \
+		-U ${kTCLUtilitiesTopPath} \
+		-g ${RUN_GUI_AFTER_BULD_HW}
 
+build_sw: clean_sw init_sw ${kSwOutTarget}
+${kSwOutTarget}: ${kSwSrcs}
+	make -f ${kSwBuildScriptPath} \
+	BUILD_DIR=${kBuildDirSw} \
+	OUTPUT_DIR=${kOutDirSw} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kTCLUtilitiesTopPath}
 
-# Clean
+init_hw: 
+	mkdir -p ${kOutDirHw} ${kBuildDirHw}
+init_sw:
+	mkdir -p ${kOutDirSw} ${kBuildDirSw}
+clean_hw:
+	rm -rf ${kOutDirHw} ${kBuildDirHw}
+clean_sw:
+	rm -rf ${kOutDirSw} ${kBuildDirSw}
 
 .PHONY: \
+	init_hw \
+	init_sw \
 	build_hw \
 	build_sw \
 	gen_os_base_dt \

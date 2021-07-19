@@ -1,5 +1,5 @@
 ###############################################################
-# This is a generated script based on design: xvc_system
+# This is a generated script based on design: xvc_server_hw
 #
 # Though there are limitations about the generated script,
 # the main purpose of this utility is to make learning
@@ -10,7 +10,7 @@
 # Check if script is running in correct Vivado version.
 ################################################################
 proc init_xcv_system_bd {design_name} {
-   set scripts_vivado_version 2020.2
+   set scripts_vivado_version 2021.1
    set current_vivado_version [version -short]
 
    if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -34,7 +34,7 @@ proc init_xcv_system_bd {design_name} {
 
 
    # CHANGE DESIGN NAME HERE
-   set design_name xvc_system
+   set design_name xvc_server_hw
 
    # If you do not already have an existing IP Integrator design open,
    # you can create a design using the following command:

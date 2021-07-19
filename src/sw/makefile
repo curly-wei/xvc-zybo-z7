@@ -1,3 +1,6 @@
+# include utiluty
+include ${UTILITIES_TOP_DIR}/color_printer/color_render.mk
+include ${UTILITIES_TOP_DIR}/max_threads/get_max_threads.mk
 # Project Porperity
 kInstallPrefix ?= /usr
 kBuildDir ?= $(shell pwd)
@@ -21,13 +24,6 @@ target := ${kOutputDir}/${kTarget}
 systemd_out_path := ${kOutputDir}/${kSystemdFile}
 bin_install_dir := ${kInstallPrefix}/bin
 sd_install_dir := ${kInstallPrefix}/lib/systemd/system
-
-#Color renderning
-define GPrint 
-	@$(eval kColorGreen := '\e[0;32m')
-	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)${1}$(kColorEnd)
-endef
 
 default: debug
 debug: start_msg create_odir debug_compile linking cp_sd end_msg
@@ -70,7 +66,6 @@ install: cp_sd, linking
 uninstall:
 	rm -f ${bin_install_dir}/${kTarget}
 	rm -f ${sd_install_dir}/${kSystemdFile}
-
 
 # Process compilations
 .PHONY: \
