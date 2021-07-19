@@ -16,7 +16,7 @@ set parameters {
 
 array set arg [cmdline::getoptions argv ${parameters}]
 
-set requiredParameters {O B t f v x b p U}
+set requiredParameters {O B t f v x b p U g}
 foreach iter ${requiredParameters} {
   if {$arg(${iter}) == ""} {
     error "Missing required parameter: -${iter}"
@@ -39,7 +39,7 @@ foreach iter ${requiredParameters} {
       set kPSPresetFile $arg(${iter})
     } elseif {$arg(${iter}) == $arg(U)} {
       set kTCLUtilitiesTopDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(m)} {
+    } elseif {$arg(${iter}) == $arg(g)} {
       set kRunGuiAfterBuild $arg(${iter})
     } else {
       error "Input arguments error"
