@@ -25,6 +25,7 @@ git clone git@github.com:curly-wei/xvc-zybo-z7-rsc.git
 
 * hw
   * [Top script](doc/faq/hw_script_faq.md)
+* [Makefile](doc/faq/makefile_faq.md)
 
 ## Contributer
 
