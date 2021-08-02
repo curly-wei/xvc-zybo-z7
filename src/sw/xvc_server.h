@@ -24,7 +24,7 @@ typedef int fd_t;
 /**
  * @brief Type of buffer, recommend using char or unsigned char
  */
-typedef uint8_t buffer_t;
+typedef uint8_t buf_t;
 
 /**
  * @brief Data type for hold on JTAG Data

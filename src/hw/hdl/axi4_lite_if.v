@@ -21,7 +21,7 @@ module axi4_lite_if # (
   // Width of S_AXI address bus
   parameter integer C_S_AXI_ADDR_WIDTH   = 5
 ) (
-  // Users to add ports here
+  // Users to add ports here  
   
   output wire [31:0] LENGTH ,
   output wire [31:0] TMS_VECTOR ,

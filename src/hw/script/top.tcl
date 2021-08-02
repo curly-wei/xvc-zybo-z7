@@ -2,21 +2,21 @@
 package require cmdline
 
 set parameters {
-  {O.arg "" "Output Dir"}
   {B.arg "" "Build Dir"}
+  {O.arg "" "Output Dir"}
+  {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
   {t.arg "" "BD-Target Name"}
   {f.arg "" "FPGA Part"}
   {v.arg "" "Path to VerilogHDL-Files"}
   {x.arg "" "Path to XDC-Files"}
   {b.arg "" "Path to Top-BD-Script-File"}
   {p.arg "" "Path to PS-Preset-Script-File"}
-  {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
   {g.arg "false" "Run Gui after build, default false"}
 }
 
 array set arg [cmdline::getoptions argv ${parameters}]
 
-set requiredParameters {O B t f v x b p U g}
+set requiredParameters {B O t f v x b p U g}
 foreach iter ${requiredParameters} {
   if {$arg(${iter}) == ""} {
     error "Missing required parameter: -${iter}"
@@ -25,6 +25,8 @@ foreach iter ${requiredParameters} {
       set kBuildDir $arg(${iter})
     } elseif {$arg(${iter}) == $arg(O)} {
       set kOutputDir $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(U)} {
+      set kTCLUtilitiesTopDir $arg(${iter})
     } elseif {$arg(${iter}) == $arg(t)} {
       set kBDName $arg(${iter})
     } elseif {$arg(${iter}) == $arg(f)} {
@@ -37,8 +39,6 @@ foreach iter ${requiredParameters} {
       set kTopBDScriptFile $arg(${iter})
     } elseif {$arg(${iter}) == $arg(p)} {
       set kPSPresetFile $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(U)} {
-      set kTCLUtilitiesTopDir $arg(${iter})
     } elseif {$arg(${iter}) == $arg(g)} {
       set kRunGuiAfterBuild $arg(${iter})
     } else {
@@ -47,13 +47,13 @@ foreach iter ${requiredParameters} {
   }
 }
 # include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/color_printer/color_render.tcl
+source ${kTCLUtilitiesTopDir}/tcl/color_render.tcl
 # include NThreadsRunVivado
-source ${kTCLUtilitiesTopDir}/max_threads/get_max_threads.tcl
+source ${kTCLUtilitiesTopDir}/tcl/get_max_threads.tcl
 
-puts [InfoStr "============================================="]
-puts [InfoStr "Start to build xvc_hw"]
-puts [InfoStr "============================================="]
+puts [InfoStr "---------------------------------------------"]
+puts [InfoStr "Run Vivado to build XVC HW"]
+puts [InfoStr "---------------------------------------------"]
 
 # Go to build dir
 puts [InfoStr "Go to xvc_hw build Directory: \n ${kBuildDir}"]
@@ -76,61 +76,35 @@ puts [InfoStr "Max threads = [get_param general.maxThreads]"]
 ## STEP#1: setup design sources and constraints
 #
 #Read-in verilog files from source folder
-foreach verilog_file ${kVerilogFiles} {
-  if { [file exists ${verilog_file} ] } {
-    read_verilog ${verilog_file}
-    puts [InfoStr "read-in src-verilog files: \n ${verilog_file}"]
-  } else {
-    error [ErrStr "${verilog_file} does not exist" ]
-  }
-}
+puts [InfoStr "read-in src-verilog files: \n ${kVerilogFiles}"]
+read_verilog ${kVerilogFiles}
 
 # Read-in xdc files from source folder
-foreach xdc_files ${kXDCFiles} {
-  if { [file exists ${xdc_files} ] } {
-    read_xdc ${xdc_files}
-    puts [InfoStr "read-in src-xdc files: \n ${xdc_files}"]
-  } else {
-    error [ErrStr "${xdc_files} does not exist" ]
-  }
-}
+puts [InfoStr "read-in src-xdc files: \n ${kXDCFiles}"]
+read_xdc ${kXDCFiles}
 
 # STEP#2: Create block diagram (bd) with ps(processor system) and jtag-axi
 #
 # Load ps preset
-if { [ file exists ${kPSPresetFile} ] } {
-  puts [InfoStr "read-in files for ps preset: \n ${kPSPresetFile}"]
-  source ${kPSPresetFile}
-} else {
-  error [ ErrStr
-    "read-in files for ps preset: < ${kPSPresetFile} > fail. \
-    This file is necessary, please check again\
-  "]  
-}
+puts [InfoStr "read-in files for ps preset: \n ${kPSPresetFile}"]
+source ${kPSPresetFile}
 
-# create the BD-Design
-if { [ file exists ${kTopBDScriptFile} ] } {
-  # read-in bd-created shell and execute it
-  puts [ InfoStr "read-in files for top xvc-bd file: \n ${kTopBDScriptFile}" ]
-  source ${kTopBDScriptFile}
-  init_xcv_system_bd ${kBDName}
-  create_root_design ""
-  # if create bd succseefully, read-in and make wrapper
-  set bd_file_and_path ".srcs/sources_1/bd/${kBDName}/${kBDName}.bd" 
-} else {
-  error [ErrStr "
-    read-in files for ps preset: < ${kTopBDScriptFile} > fail. \
-    This file is necessary, please check again\
-  "]
-}
+# read-in bd-created shell and execute it
+puts [ InfoStr "read-in files for top xvc-bd file: \n ${kTopBDScriptFile}" ]
+source ${kTopBDScriptFile}
+init_xcv_system_bd ${kBDName}
+create_root_design ""
+
+# if create bd succseefully, read-in and make wrapper
+set bd_files_path "${kBuildDir}/.srcs/sources_1/bd/${kBDName}/${kBDName}.bd" 
 
 # create bd wrapper for top hw
-set_property synth_checkpoint_mode None [ get_files ${bd_file_and_path} ]
+set_property synth_checkpoint_mode None [ get_files ${bd_files_path} ]
 # synth_checkpoint_mode refer to doc/faq/hw_script_faq.md
 # chapter
 # 1.2 About `set_property synth_checkpoint_mode None...
 
-generate_target all [ get_files ${bd_file_and_path} ]
+generate_target all [ get_files ${bd_files_path} ]
 set top_bd_wrapper_name "${kBDName}_wrapper"
 set top_bd_wrapper_path \
   "${kBuildDir}/.gen/sources_1/bd/${kBDName}/hdl/${top_bd_wrapper_name}.v"
@@ -221,9 +195,9 @@ write_hw_platform -fixed -include_bit -force -verbose \
   "${kOutputDir}/${kBDName}.xsa"
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}.xsa"
 
-puts [InfoStr "============================================="]
-puts [InfoStr "Build xvc_hw completed"]
-puts [InfoStr "============================================="]
+puts [InfoStr "---------------------------------------------"]
+puts [InfoStr "Run Vivado to build XVC HW has completed"]
+puts [InfoStr "---------------------------------------------"]
 
 # After build, start gui to check (optional)
 if {${kRunGuiAfterBuild} == "true"} {

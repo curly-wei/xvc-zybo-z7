@@ -1,17 +1,8 @@
-# Founction Redering string output
-proc ErrStr {strs} {
-  set kColorRBegin "\x1b\[1;31m"
-  set kColorEnd "\x1b\[0m"
-  return "UserERROR: ${kColorRBegin}${strs}${kColorEnd}"
-}
-proc InfoStr {strs} {
-  set kColorGBegin "\x1b\[1;32m"
-  set kColorEnd "\x1b\[0m"
-  return "UserINFO: ${kColorGBegin}${strs}${kColorEnd}"
-}
+# include ErrStr and InfoStr
+source ${kTCLUtilitiesTopDir}/tcl/color_render.tcl
 
 puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Start to Build FSBL"]
+puts [InfoStr "Run Vivado to build FSBL"]
 puts [InfoStr "-----------------------------------------------"]
 
 # IO properties
@@ -85,5 +76,5 @@ file copy ${kFSBLGenPath} ${kOutputDir}
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
 puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Build FSBL completed"]
+puts [InfoStr "Run Vivado to build FSBL has completed"]
 puts [InfoStr "-----------------------------------------------"]

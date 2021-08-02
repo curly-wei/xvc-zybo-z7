@@ -1,9 +1,9 @@
 /**
- * @file xvc_server.c
+ * @file xvc_server.c 
  * @brief Implemention of xvc_server
  * @author dewei
- * @date 2021-2-2
- * @version 0.0.1
+ * @date 2021-2-2  
+ * @version 0.0.1 
 */
 
 #include "xvc_server_param.h"
@@ -11,6 +11,7 @@
 
 #include <stdio.h>       
 #include <stdlib.h>
+#include <string.h> //print strings for error.h and invoke strlen, mem*
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,6 +24,17 @@
  */
 #define MAX(a,b) \
   ((a)>(b)?(a):(b))
+
+#ifndef RELEASE
+  #include <errno.h>
+  extern int errno ;
+  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_DETAIL(msg_str)
+  #define DEBUG_MSG(msg_str) printf("%s\n",msg_str)
+#else
+  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_SIMPLE(msg_str)
+  #define DEBUG_MSG(msg_str)
+#endif 
+
 
 /**
  * @brief Simply stdout of error message
@@ -38,17 +50,6 @@
 #define XVC_ERROR_MSG_DETAIL(msg_str) \
   fprintf(stderr, "%s: %s\n, at #%d, file: %s\n", \
   (msg_str), strerror(errno), __LINE__, __FILE__)
-
-#ifndef RELEASE
-  #include <errno.h>
-  #include <string.h> //print strings for error.h
-  extern int errno ;
-  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_DETAIL(msg_str)
-  #define DEBUG_MSG(msg_str) printf("%s\n",msg_str)
-#else
-  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_SIMPLE(msg_str)
-  #define DEBUG_MSG(msg_str)
-#endif 
 
 /**
  * @brief Status of general Unix manipulate returned
@@ -71,22 +72,18 @@ enum SelectResult {
  * 
  * @param fd File descriptor(fd)
  * @param target Buffer for command content
- * @param len_to_read Length for 
+ * @param target_len target length to read (Byte)
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool StreamRead(
-  	const fd_t fd, 
-		buffer_t* target, 
-		size_t len_to_read
-) {
-  buffer_t* indirect = target;
-  while (len_to_read) {
-		ssize_t n_byte_read = read(fd, indirect, len_to_read); // ssize_t != int
+static inline bool StreamRead(const fd_t fd, buf_t* target, size_t target_len) {
+  buf_t* temp = target;
+  while (target_len) {
+		ssize_t n_byte_read = read(fd, temp, target_len); // ssize_t != int
 		if (n_byte_read <= (ssize_t) 0) // ssize_t [-1 .. +INT_MAX] on linux
 			return false;
-		indirect += (uint32_t) n_byte_read; //C11, 6.5.6/P8 and 6.2.5/P17
-		len_to_read -= n_byte_read;
+		temp += n_byte_read; //C11, 6.5.6/P8 and 6.2.5/P17
+		target_len -= n_byte_read;
 	}
 	return true;
 }
@@ -98,10 +95,10 @@ static inline bool StreamRead(
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool jtag_eth_bridge(const fd_t eth, volatile jtag_t* jtag) {
+static inline bool JtagEthBridge(const fd_t eth, volatile jtag_t* jtag) {
   while (true) {
-    buffer_t cmd[kCmdSize];
-    buffer_t buffer[kBufferSize], result[kBufferSize/2];
+    buf_t cmd[kCmdSize];
+    buf_t buffer[kBufferSize], result[kBufferSize/2];
     memset(cmd, 0, kCmdSize);
 
     if (!StreamRead(eth, cmd, 2) )
@@ -264,7 +261,7 @@ int main() {
           XVC_ERROR_MSG("connection is except");
           exit(EXIT_FAILURE);
         } else {
-          jtag_eth_bridge(fd_iter, xvc_jtag_mem_loc);
+          JtagEthBridge(fd_iter, xvc_jtag_mem_loc);
         }
       }
     }
