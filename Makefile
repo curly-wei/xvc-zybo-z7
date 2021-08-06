@@ -10,6 +10,8 @@ kProjName := xvc_server
 # property for Build I/O Directories #
 ######################################
 
+ApplyMaxJobs := -j$(shell nproc)
+
 PROJ_ROOT_DIR ?= $(shell pwd)
 BUILD_DIR ?= ${PROJ_ROOT_DIR}/build
 
@@ -26,22 +28,22 @@ kSrcDirOs := ${kProjRootDir}/src/os
 kOutDir := ${kBuildDir}
 kOutDirHw := ${kBuildDir}/out/hw
 kOutDirSw := ${kBuildDir}/out/sw
-kOutDirOs := ${kBuildDir}/out/os
 
-kOutDirOsFSBL := ${kOutDirOs}/fsbl
-kOutDirOsDT := ${kOutDirOs}/dt
-kOutDirOsKernel := ${kOutDirOs}/kernel
-kOutDirOsUboot := ${kOutDirOs}/uboot
-kOutDirOsRootFs := ${kOutDirOs}/rootfs
+kOutDirOsFSBL := ${kBuildDir}/fsbl
+kOutDirOsDT := ${kBuildDir}/dt
+kOutDirOsKernel := ${kBuildDir}/kernel
+kOutDirOsUboot := ${kBuildDir}/uboot
+kOutDirOsBusybox := ${kBuildDir}/busybox
 
 # Build Dirs
 kBuildDirHw := ${kBuildDir}/build_hw
 kBuildDirSw := ${kBuildDir}/build_sw
-kBuildDirOSFSBL := ${kBuildDir}/build_os/fsbl
-kBuildDirOSDT := ${kBuildDir}/build_os/dt
-kBuildDirOSKernel := ${kBuildDir}/build_os/kernel
-kBuildDirOSUBoot := ${kBuildDir}/build_os/uboot
-kBuildDirOSURootFS := ${kBuildDir}/build_os/rootfs
+
+kBuildDirOsFSBL := ${kBuildDir}/fsbl
+kBuildDirOsDT := ${kBuildDir}/dt
+kBuildDirOsKernel := ${kBuildDir}/kernel
+kBuildDirOsUBoot := ${kBuildDir}/uboot
+kBuildDirOsBusybox := ${kBuildDir}/busybox
 
 #########################
 # property for Compiler #
@@ -109,10 +111,11 @@ kFSBLBuildScriptDir := ${kSrcDirOs}/fsbl
 
 kDTBuildScriptDir := ${kSrcDirOs}/dt
 kDTBuildArgs := \
-	BUILD_DIR=${kBuildDirSw} \
-	OUTPUT_DIR=${kOutDirSw} \
+	BUILD_DIR=${kBuildDirOSDT} \
+	OUTPUT_DIR=${kOutDirOsDT} \
 	XSCT_CLI=${XSCT_CLI} \
-	XSA_SRCS_PATH=${kHwTargetPath}
+	XSA_SRCS_PATH=${kHwTargetPath} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 
 ################################################################################
@@ -138,19 +141,22 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 # All build #
 #############
 
-all: build_hw build_sw build_os
+all: \
+	build_hw build_sw \
+	gen_base_dt build_fsbl \
+	build_kernel build_uboot build_busybox
 
 build_hw: 
-	make -C ${kHwBuildScriptDir} ${kHwBuildArgs}
+	make ${ApplyMaxJobs} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
 
 build_sw: 
-	make -C ${kSwBuildScriptDir} ${kSwBuildArgs}
+	make ${ApplyMaxJobs} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
 
 gen_base_dt: build_hw
-	make -C ${kDTBuildScriptDir} ${kDTBuildArgs}
+	make ${ApplyMaxJobs} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
 
 build_fsbl: build_hw
-
+	
 build_kernel:
 
 build_uboot:
@@ -164,11 +170,11 @@ build_busybox:
 ################################################################################
 
 clean_hw:
-	make -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
+	make ${ApplyMaxJobs} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
 clean_sw:
-	make -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
+	make ${ApplyMaxJobs} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
 clean_dt:
-	make -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+	make ${ApplyMaxJobs} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
 
 distclean: \
 	clean_hw \
@@ -185,5 +191,13 @@ distclean: \
 	clean_hw \
 	clean_sw \
 	clean_dt \
-	distclean
+	distclean \
+	all \
+	build_hw \
+	build_sw \
+	gen_base_dt \
+	build_fsbl \
+	build_kernel \
+	build_uboot \
+	build_busybox
 	

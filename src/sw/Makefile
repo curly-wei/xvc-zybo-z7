@@ -28,7 +28,9 @@ kTargetExecRelease := ${kOutputDir}/${kTarget}.elf
 kObjDebug := ${kBuildDir}/${kTarget}-d.o
 kObjRelease := ${kBuildDir}/${kTarget}.o
 
-kDeps := ${kCSrcsPath} ${kCHeaders}
+kDeps := \
+	${kCSrcsPath} \
+	${kCHeaders}
 
 kCC := ${CROSS_COMPILE}gcc
 kDebugFlags := -g
@@ -80,6 +82,7 @@ clean:
 	start_msg \
 	end_msg \
 	init_dir \
+	default \
 	debug_build \
 	release_build \
 	clean

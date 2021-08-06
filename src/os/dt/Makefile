@@ -16,10 +16,12 @@ kXsctCLIArgs :=
 ## Please cheack here ##
 ########################
 
-kXilDTSrcRepoURL = https://github.com/Xilinx/device-tree-xlnx.git
-kXilDTSrcLocalDirName = device-tree-xlnx
-kXilDTSrcRemoteBranchTag = master
-kXilDTSrcLocalPath = ${kBuildDir}/${kXilDTSrcLocalDirName}
+kBuildTCLScript := 
+
+kXilDTSrcRepoURL := https://github.com/Xilinx/device-tree-xlnx.git
+kXilDTSrcLocalDirName := device-tree-xlnx
+kXilDTSrcRemoteBranchTag := master
+kXilDTSrcLocalPath := ${kBuildDir}/${kXilDTSrcLocalDirName}
 ################################################################################
 
 clone_repo_from_remote:
@@ -29,7 +31,10 @@ clone_repo_from_remote:
 		${kXilDTSrcRepoURL} ${kXilDTSrcLocalPath}
 
 gen_base_dt: ${kXSASrcsPath} clone_repo_from_remote
-	
+	${kXsctCLI} 
+
 clean:
+	$(call GPrint,"UserINFO: Clean xvc_os_dt build/out directories")
+	rm -rf ${kBuildDir} ${kOutputDir}
 
 .PHONY: clean

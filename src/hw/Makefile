@@ -65,7 +65,7 @@ kVivadoCLIArgs := \
 	-g ${kRunGuiAfterBuildHw}
 
 
-default: start_msg init_dir ${kTargetXSA} end_msg
+all: start_msg init_dir ${kTargetXSA} end_msg
 ${kTargetXSA}: ${kDeps}
 	$(call GPrint,"UserINFO: Start to build hw...")
 	${kVivadoCLI} ${kVivadoCLIFlags} \
@@ -91,6 +91,7 @@ clean:
 	rm -rf ${kBuildDir} ${kOutputDir}
 
 .PHONY: \
+	all \
 	start_msg \
 	end_msg \
 	init_dir \

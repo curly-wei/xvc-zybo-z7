@@ -15,14 +15,14 @@ module axi4_lite_if # (
 
   // User parameters ends
   // Do not modify the parameters beyond this line
-
+   
   // Width of S_AXI data bus
   parameter integer C_S_AXI_DATA_WIDTH   = 32,
   // Width of S_AXI address bus
   parameter integer C_S_AXI_ADDR_WIDTH   = 5
 ) (
-  // Users to add ports here  
-  
+  // Users to add ports here
+    
   output wire [31:0] LENGTH ,
   output wire [31:0] TMS_VECTOR ,
   output wire [31:0] TDI_VECTOR ,
