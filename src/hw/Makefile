@@ -1,5 +1,7 @@
 # include utiluty
-include ${UTILITIES_TOP_DIR}/makefile/color_printer.mk
+kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+
+include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -31,7 +33,7 @@ kXDCSrcsPath := \
 kTopBuildScriptPath := ${kScriptsDir}/${kTopBuildScript}
 kBuildScriptBDPath := ${kScriptsDir}/${kBuildScriptBD}
 kBuildScriptPSPresetPath := ${kScriptsDir}/${kBuildScriptPSPreset}
-kTCLUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
 
 kRunGuiAfterBuildHw := ${RUN_GUI_AFTER_BULD_HW}
 
@@ -46,6 +48,7 @@ kDeps := \
 	${kBuildScriptPSPresetPath} \
 	${kTCLUtilitiesTopPath}
 
+# Compiler
 kVivadoCLI := ${VIVADO_CLI}
 kVivadoCLIFlags := \
 	-mode batch -notrace \
@@ -65,29 +68,25 @@ kVivadoCLIArgs := \
 	-g ${kRunGuiAfterBuildHw}
 
 
-all: start_msg init_dir ${kTargetXSA} end_msg
+all: | start_msg init_dir ${kTargetXSA} end_msg
 ${kTargetXSA}: ${kDeps}
-	$(call GPrint,"UserINFO: Start to build hw...")
+	$(call InfoPrint,"Start to build hw...")
 	${kVivadoCLI} ${kVivadoCLIFlags} \
 		-source ${kTopBuildScriptPath} \
 		-tclargs ${kVivadoCLIArgs}
 
 start_msg:
-	$(call GPrint,"=============================================")
-	$(call GPrint,"UserINFO: Start to build xvc_hw")
-	$(call GPrint,"=============================================")
+	$(call InfoPrint,"Start to check/build xvc_hw")
 
 end_msg:
-	$(call GPrint,"=============================================")
-	$(call GPrint,"UserINFO: Build xvc_hw has completed")
-	$(call GPrint,"=============================================")
+	$(call InfoPrint,"Check/Build xvc_hw has completed")
 
 init_dir :
-	$(call GPrint,"UserINFO: Create OutDir and BuildDir for xvc_hw")
+	$(call InfoPrint,"Create OutDir and BuildDir for xvc_hw")
 	mkdir -p ${kBuildDir} ${kOutputDir}
 
 clean: 
-	$(call GPrint,"UserINFO: Clean xvc_hw build/out directories")
+	$(call InfoPrint,"Clean xvc_hw build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}
 
 .PHONY: \

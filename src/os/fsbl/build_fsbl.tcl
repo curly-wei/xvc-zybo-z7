@@ -1,17 +1,55 @@
+
+# get-opt
+package require cmdline
+
+set parameters {
+  {B.arg "" "Build Dir"}
+  {O.arg "" "Output Dir"}
+  {t.arg "" "Target name of this project"}
+  {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
+  {x.arg "" "Path to xvc_server_hw.xsa"}
+}
+
+array set arg [cmdline::getoptions argv ${parameters}]
+
+set requiredParameters {B O t U x}
+foreach iter ${requiredParameters} {
+  if {$arg(${iter}) == ""} {
+    error "Missing required parameter: -${iter}"
+  } else {
+    if {$arg(${iter}) == $arg(B)} {
+      set kBuildDir $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(O)} {
+      set kOutputDir $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(U)} {
+      set kTCLUtilitiesTopDir $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(t)} {
+      set kAPPName $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(x)} {
+      set kXSAFilePath $arg(${iter})
+    } else {
+      error "Input arguments error"
+    }
+  }
+}
+
 # include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/tcl/color_render.tcl
+source ${kTCLUtilitiesTopDir}/color_render.tcl
+
+# include NThreadsRunVivado
+source ${kTCLUtilitiesTopDir}/get_max_threads.tcl
+set kMaxThreads [MaxThreads]
 
 puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Run Vivado to build FSBL"]
+puts [InfoStr "Run Vitist-XCST to build FSBL"]
 puts [InfoStr "-----------------------------------------------"]
 
-# IO properties
-set kXSAFilePath "[pwd]/xvc_server_hw/xvc_system_top.xsa"
-set kBuildDir "[pwd]/build_xvc_fsbl"
-set kOutputDir "[pwd]/xvc_server_os/fsbl" 
+#Clean previous build
+puts [InfoStr "remove previous build object"]
+file delet -force ${kBuildDir}
+file mkdir ${kBuildDir}
 
 #Build properties
-set kAPPName "xvc_fsbl"
 set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
 
@@ -20,18 +58,8 @@ set kFSBLGenDir "${kBuildDir}/${kAPPName}/Debug"
 set kFSBLGenFileName "${kAPPName}.elf"
 set kFSBLGenPath "${kFSBLGenDir}/${kFSBLGenFileName}"
 
-puts [InfoStr "clear previous build objects"]
-file delete -force ${kOutputDir} ${kBuildDir}
-
-puts [InfoStr "check xsa file if exist"]
-if { [file exist ${kXSAFilePath}] == 1} {
-  puts [InfoStr "Found xsa file, located at:"]
-  puts [InfoStr [file normalize ${kXSAFilePath}] ]
-} else {
-  error [ErrStr "xsa file does not exist"]
-}
-
 puts [InfoStr "create/set work(build) dir"]
+cd ${kBuildDir}
 setws ${kBuildDir}
 
 puts [InfoStr "create output dir"]
@@ -41,7 +69,6 @@ puts [InfoStr "create pf"]
 platform create \
   -name ${kPlatformName} \
   -hw ${kXSAFilePath}
-
 
 puts [InfoStr "create domain"]
 domain create \
@@ -56,25 +83,28 @@ puts [InfoStr "generate pf"]
 platform generate
 
 puts [InfoStr "create app"]
-app create \
-  -name ${kAPPName} \
+app create -name ${kAPPName} \
   -platform ${kPlatformName} \
   -domain ${kDomainName} \
-  -template {Zynq FSBL} 
+  -template {Zynq FSBL}
 
 puts [InfoStr "conf app"]
 app config \
   -name ${kAPPName} \
   define-compiler-symbols {FSBL_DEBUG_INFO}
 
+app config \
+  -name ${kAPPName} \
+  -add compiler-misc {-std=c11}
+
 puts [InfoStr "build app"]
 app build -name ${kAPPName} 
 
 puts [InfoStr "export fsbl.elf file to output dir"]
-file copy ${kFSBLGenPath} ${kOutputDir}
+file copy -force ${kFSBLGenPath} ${kOutputDir}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
 puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Run Vivado to build FSBL has completed"]
+puts [InfoStr "Run Vitist-XCST to build FSBL has completed"]
 puts [InfoStr "-----------------------------------------------"]

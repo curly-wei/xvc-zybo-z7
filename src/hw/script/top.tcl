@@ -47,9 +47,9 @@ foreach iter ${requiredParameters} {
   }
 }
 # include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/tcl/color_render.tcl
+source ${kTCLUtilitiesTopDir}/color_render.tcl
 # include NThreadsRunVivado
-source ${kTCLUtilitiesTopDir}/tcl/get_max_threads.tcl
+source ${kTCLUtilitiesTopDir}/get_max_threads.tcl
 
 puts [InfoStr "---------------------------------------------"]
 puts [InfoStr "Run Vivado to build XVC HW"]

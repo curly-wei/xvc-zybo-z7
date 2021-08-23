@@ -1,13 +1,13 @@
 #Color renderning Green
-define GPrint 
-	@$(eval kColorGreen := '\e[0;32m')
+define InfoPrint 
+	@$(eval kColorGreen := '\e[1;32m')
 	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)${1}$(kColorEnd)
+	@echo -e $(kColorGreen)"[UserINFO]: "${1}$(kColorEnd)
 endef
 
 #Color renderning Red
-define RPrint 
-	@$(eval kColorRed := '\e[0;31m')
+define ErrorPrint 
+	@$(eval kColorRed := '\e[1;31m')
 	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)${1}$(kColorEnd)
+	@echo -e $(kColorGreen)"[UserINFO]: "${1}$(kColorEnd)
 endef

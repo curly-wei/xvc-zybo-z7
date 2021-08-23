@@ -10,8 +10,6 @@ kProjName := xvc_server
 # property for Build I/O Directories #
 ######################################
 
-ApplyMaxJobs := -j$(shell nproc)
-
 PROJ_ROOT_DIR ?= $(shell pwd)
 BUILD_DIR ?= ${PROJ_ROOT_DIR}/build
 
@@ -25,25 +23,25 @@ kSrcDirSw := ${kProjRootDir}/src/sw
 kSrcDirOs := ${kProjRootDir}/src/os
 
 # Output Dirs
-kOutDir := ${kBuildDir}
-kOutDirHw := ${kBuildDir}/out/hw
-kOutDirSw := ${kBuildDir}/out/sw
+kOutDir := ${kBuildDir}/out
+kOutDirHw := ${kOutDir}/hw
+kOutDirSw := ${kOutDir}/sw
 
-kOutDirOsFSBL := ${kBuildDir}/fsbl
-kOutDirOsDT := ${kBuildDir}/dt
-kOutDirOsKernel := ${kBuildDir}/kernel
-kOutDirOsUboot := ${kBuildDir}/uboot
-kOutDirOsBusybox := ${kBuildDir}/busybox
+kOutDirOsDT := ${kOutDir}/dt
+kOutDirOsFSBL := ${kOutDir}/fsbl
+kOutDirOsKernel := ${kOutDir}/kernel
+kOutDirOsUboot := ${kOutDir}/uboot
+kOutDirOsBusybox := ${kOutDir}/busybox
 
 # Build Dirs
 kBuildDirHw := ${kBuildDir}/build_hw
 kBuildDirSw := ${kBuildDir}/build_sw
 
-kBuildDirOsFSBL := ${kBuildDir}/fsbl
-kBuildDirOsDT := ${kBuildDir}/dt
-kBuildDirOsKernel := ${kBuildDir}/kernel
-kBuildDirOsUBoot := ${kBuildDir}/uboot
-kBuildDirOsBusybox := ${kBuildDir}/busybox
+kBuildDirOsDT := ${kBuildDir}/build_dt
+kBuildDirOsFSBL := ${kBuildDir}/build_fsbl
+kBuildDirOsKernel := ${kBuildDir}/build_kernel
+kBuildDirOsUBoot := ${kBuildDir}/build_uboot
+kBuildDirOsBusybox := ${kBuildDir}/build_busybox
 
 #########################
 # property for Compiler #
@@ -104,19 +102,48 @@ kSwBuildArgs := \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 #########################
-# property for build os #
+# property for build dt #
 #########################
-
-kFSBLBuildScriptDir := ${kSrcDirOs}/fsbl
 
 kDTBuildScriptDir := ${kSrcDirOs}/dt
 kDTBuildArgs := \
-	BUILD_DIR=${kBuildDirOSDT} \
+	BUILD_DIR=${kBuildDirOsDT} \
 	OUTPUT_DIR=${kOutDirOsDT} \
 	XSCT_CLI=${XSCT_CLI} \
 	XSA_SRCS_PATH=${kHwTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
+###########################
+# property for build fsbl #
+###########################
+
+kFSBLTarget := xvc_server_fsbl.elf
+kFSBLTargetPath := ${kOutDirOsFSBL}/${kFSBLTarget}
+
+kFSBLBuildScriptDir := ${kSrcDirOs}/fsbl
+kFSBLBuildArgs := \
+	FSBL_TARGET=${kFSBLTargetPath} \
+	BUILD_DIR=${kBuildDirOsFSBL} \
+	OUTPUT_DIR=${kOutDirOsFSBL} \
+	XSCT_CLI=${XSCT_CLI} \
+	XSA_SRCS_PATH=${kHwTargetPath} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
+
+#############################
+# property for build kernel #
+#############################
+
+kKernelTarget := uImage
+kKernelTargetPath := ${kOutDirOsKernel}/${kKernelTarget}
+
+kKernelBuildScriptDir := ${kSrcDirOs}/kernel
+kKernelBuildArgs := \
+	KERNEL_TARGET=${kKernelTargetPath} \
+	BUILD_DIR=${kBuildDirOsKernel} \
+	OUTPUT_DIR=${kOutDirOsKernel} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 ################################################################################
 #########
@@ -147,17 +174,19 @@ all: \
 	build_kernel build_uboot build_busybox
 
 build_hw: 
-	make ${ApplyMaxJobs} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
+	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
 
 build_sw: 
-	make ${ApplyMaxJobs} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
+	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
 
 gen_base_dt: build_hw
-	make ${ApplyMaxJobs} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
+	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
 
 build_fsbl: build_hw
-	
+	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs}
+
 build_kernel:
+	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs}
 
 build_uboot:
 
@@ -170,16 +199,22 @@ build_busybox:
 ################################################################################
 
 clean_hw:
-	make ${ApplyMaxJobs} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
+	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
 clean_sw:
-	make ${ApplyMaxJobs} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
+	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
 clean_dt:
-	make ${ApplyMaxJobs} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+clean_fsbl:
+	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs} clean
+clean_kernel:
+	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
 
 distclean: \
 	clean_hw \
 	clean_sw \
-	clean_dt
+	clean_dt \
+	clean_fsbl \
+	clean_kernel
 
 ################################################################################
 #########

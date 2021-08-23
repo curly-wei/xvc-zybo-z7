@@ -1,5 +1,7 @@
 # include utiluty
-include ${UTILITIES_TOP_DIR}/makefile/color_printer.mk
+kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+
+include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -30,52 +32,47 @@ kObjRelease := ${kBuildDir}/${kTarget}.o
 
 kDeps := \
 	${kCSrcsPath} \
-	${kCHeaders}
+	${kCHeadersPath}
 
+# Compiler
 kCC := ${CROSS_COMPILE}gcc
 kDebugFlags := -g
 kReleaseFlags := -O2 -D RELEASE 
 kCFlags := -std=c11 -Wall
 kLDFlags := -static
 
-
 default: debug_build
-debug_build: start_msg init_dir ${kTargetExecDebug} end_msg
-release_build: start_msg init_dir ${kTargetExecRelease} end_msg
+debug_build: | start_msg init_dir ${kTargetExecDebug} end_msg
+release_build: | start_msg init_dir ${kTargetExecRelease} end_msg
 
 ${kTargetExecDebug}: ${kObjDebug}
-	$(call GPrint,"UserINFO: Linking...")
+	$(call InfoPrint,"Linking...")
 	${kCC} ${kLDFlags} ${kObjDebug} -o ${kTargetExecDebug}
 
 ${kTargetExecRelease}: ${kTargetExecRelease}
-	$(call GPrint,"UserINFO: Linking...")
+	$(call InfoPrint,"Linking...")
 	${kCC} ${kLDFlags} ${kObjRelease} -o ${kTargetExecRelease}
 
 ${kObjDebug}: ${kDeps}
-	$(call GPrint,"UserINFO: Compiling (debug)...")
+	$(call InfoPrint,"Compiling (debug)...")
 	${kCC} ${kCFlags} ${kDebugFlags} -c ${kCSrcsPath} -o ${kObjDebug}
 
 ${kObjRelease}: ${kDeps}
-	$(call GPrint,"UserINFO: Compiling (release)...")
+	$(call InfoPrint,"Compiling (release)...")
 	${kCC} ${kCFlags} ${kReleaseFlags} -c ${kCSrcsPath} -o ${kObjDebug}
 
-
 start_msg:
-	$(call GPrint,"=============================================")
-	$(call GPrint,"UserINFO: Start to build xvc_sw")
-	$(call GPrint,"=============================================")
+	$(call InfoPrint,"Start to check/build xvc_sw")
 
 end_msg:
-	$(call GPrint,"=============================================")
-	$(call GPrint,"UserINFO: Build xvc_sw has completed")
-	$(call GPrint,"=============================================")
+	$(call InfoPrint,"Check/Build xvc_sw has completed")
 
 init_dir: 
-	$(call GPrint,"UserINFO: Create OutDir and BuildDir for xvc_sw")
+	$(call InfoPrint,"Create OutDir and BuildDir for xvc_sw")
 	mkdir -p ${kBuildDir} ${kOutputDir}
 
 clean: 
-	$(call GPrint,"UserINFO: Clean xvc_sw build/out directories")
+	$(call InfoPrint,"Clean xvc_sw build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}
 
 .PHONY: \

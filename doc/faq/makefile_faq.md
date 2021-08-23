@@ -49,3 +49,13 @@ So if your `var` may conatin **space**, than please `""` into your `${var}` when
 Some case such as `vivado x.tcl -args ...` or `xsct x.tcl -args ...`
 
 will auto handling arguments  `...`, so **don't add `""` for this case**
+
+## 2 What's different between `${MAKE}` and `make` for build sub-makefile?
+
+[See here](https://www.gnu.org/software/make/manual/html_node/MAKE-Variable.html)
+
+`${MAKE} -C` can progress some special make flags into sub-makefile,
+
+such as `-j`, `-t, just-print`, ...etc.
+
+but `make -C` can't.

@@ -7,11 +7,12 @@ set parameters {
   {O.arg "" "Output Dir"}
   {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
   {x.arg "" "Path to xvc_server_hw.xsa"}
+  {R.arg "" "Top-Dir to local Xilinx-DT-Repository"}
 }
 
 array set arg [cmdline::getoptions argv ${parameters}]
 
-set requiredParameters {B O U x}
+set requiredParameters {B O U x R}
 foreach iter ${requiredParameters} {
   if {$arg(${iter}) == ""} {
     error "Missing required parameter: -${iter}"
@@ -24,6 +25,8 @@ foreach iter ${requiredParameters} {
       set kTCLUtilitiesTopDir $arg(${iter})
     } elseif {$arg(${iter}) == $arg(x)} {
       set kXSAFilePath $arg(${iter})
+    } elseif {$arg(${iter}) == $arg(R)} {
+      set kXilDTSrcLocalPath $arg(${iter})
     } else {
       error "Input arguments error"
     }
@@ -31,39 +34,17 @@ foreach iter ${requiredParameters} {
 }
 
 # include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/tcl/color_render.tcl
+source ${kTCLUtilitiesTopDir}/color_render.tcl
 
 puts [InfoStr "-----------------------------------------------"]
 puts [InfoStr "Start to Generate Device Tree for xvc"]
 puts [InfoStr "-----------------------------------------------"]
 
-#Output file(cp) properties
+puts [InfoStr "go to work directory"]
+cd ${kBuildDir}
 
-# Local/Remote Repo property
-set kXilDTSrcRepoURL "https://github.com/Xilinx/device-tree-xlnx.git"
-set kXilDTSrcLocalDirName "device-tree-xlnx"
-set kXilDTSrcRemoteBranchTag "master"
-set kXilDTSrcLocalPath "${kBuildDir}/${kXilDTSrcLocalDirName}"
-
-puts [InfoStr "clone dt repo from remote"]
-exec -ignorestderr \
-  git clone \
-  --depth=1 \
-  --branch=${kXilDTSrcRemoteBranchTag} \
-  ${kXilDTSrcRepoURL} ${kXilDTSrcLocalPath}
-# if no "-ignorestderr" then build will be interruped,
-# because git display download message with stderr
-
-puts [InfoStr "Set DT repositary from xilinx-git"]
+puts [InfoStr "set DT repositary from xilinx-git"]
 hsi::set_repo_path ${kXilDTSrcLocalPath}
-
-puts [InfoStr "check xsa file if exist"]
-if { [file exist ${kXSAFilePath}] == 1} {
-  puts [InfoStr "Found xsa file, located at:"]
-  puts [InfoStr [file normalize ${kXSAFilePath}] ]
-} else {
-  error [ErrStr "xsa file does not exist"]
-}
 
 puts [InfoStr "read xsa file"]
 hsi::open_hw_design ${kXSAFilePath}
