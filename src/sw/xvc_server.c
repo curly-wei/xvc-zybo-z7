@@ -28,10 +28,10 @@
 #ifndef RELEASE
   #include <errno.h>
   extern int errno ;
-  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_DETAIL(msg_str)
+  #define ERROR_MSG(msg_str) ERROR_MSG_DETAIL(msg_str)
   #define DEBUG_MSG(msg_str) printf("%s\n",msg_str)
 #else
-  #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_SIMPLE(msg_str)
+  #define ERROR_MSG(msg_str) ERROR_MSG_SIMPLE(msg_str)
   #define DEBUG_MSG(msg_str)
 #endif 
 
@@ -39,17 +39,21 @@
 /**
  * @brief Simply stdout of error message
  */
-#define XVC_ERROR_MSG_SIMPLE(msg_str) \
-  perror(msg_str)
+#define ERROR_MSG_SIMPLE(msg_str) \
+  do { \
+    perror(msg_str); \
+  } while(0)
 
 /**
  * @brief 
  * More detailing error messages, which
  * contained file-name and #-of-line and errno-strings
  */
-#define XVC_ERROR_MSG_DETAIL(msg_str) \
-  fprintf(stderr, "%s: %s\n, at #%d, file: %s\n", \
-  (msg_str), strerror(errno), __LINE__, __FILE__)
+#define ERROR_MSG_DETAIL(msg_str) \
+  do { \
+    fprintf(stderr, "%s: %s\n, at #%d, file: %s\n", \
+            (msg_str), strerror(errno), __LINE__, __FILE__); \
+  } while(0)
 
 /**
  * @brief Status of general Unix manipulate returned
@@ -90,32 +94,52 @@ static inline bool StreamRead(const fd_t fd, buf_t* target, size_t target_len) {
 
 /**
  * @brief Forwaed ehternet data to jtag (or inversed direction)
- * @param eth File Descriptor of Ehernet (socker)
+ * @param eth_fd File Descriptor of Ehernet (socket)
  * @param jtag Memory Map of Jtag Location
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool JtagEthBridge(const fd_t eth, volatile jtag_t* jtag) {
+static inline bool JtagEthBridge(const fd_t eth_fd, volatile jtag_t* jtag) {
   while (true) {
     buf_t cmd[kCmdSize];
     buf_t buffer[kBufferSize], result[kBufferSize/2];
     memset(cmd, 0, kCmdSize);
 
-    if (!StreamRead(eth, cmd, 2) )
+    if (!StreamRead(eth_fd, cmd, 2) )
       return true;
-    
+
     /* Read and judge command */
     if (memcmp(cmd, "ge", 2) == (int) 0 ) {
-      if (!StreamRead(eth, cmd, 6) ) 
+      if (!StreamRead(eth_fd, cmd, 6) ) 
         return true;
       memcpy(result, kXVCInfo, strlen(kXVCInfo) );
-
+      if (write(eth_fd, result, strlen(kXVCInfo))  
+          != strlen(strlen(kXVCInfo)) ) {
+        ERROR_MSG("Failed to write XVCInfo");
+        return false;
+      }
+      DEBUG_MSG("Received command getXVCInfo, Replied with:");
+      DEBUG_MSG(kXVCInfo);
+      break;
     } else if (memcmp(cmd, "se", 2) == (int) 0) {
-
+      if (!StreamRead(eth_fd, cmd, 9) ) 
+        return true;
+      memcpy(result, cmd+5, 4);
+      if (write(eth_fd, result, 4) != (int) 4) {
+        ERROR_MSG("Failed to write setSCK");
+        return false;
+      }
+      DEBUG_MSG("Received command: setTCK, Replied with");
+      DEBUG_MSG(cmd+5);
+      break;
     } else if (memcmp(cmd, "sh", 2) == (int) 0) {
-      
+      if (!StreamRead(eth_fd, cmd, 4) ) {
+        ERROR_MSG("Received command: Shift");
+        return false;
+      } 
     } else {
-
+      ERROR_MSG("Invaild cmd: ");
+      ERROR_MSG(cmd);
     }
     
 
@@ -129,7 +153,7 @@ int main() {
   /* init fd to uio */
   const fd_t xvc_fd_uio = open(kUIOPath, O_RDWR);
   if (xvc_fd_uio == kUnixFailed) {
-    XVC_ERROR_MSG("Failed to Open UIO Device");
+    ERROR_MSG("Failed to Open UIO Device");
     exit(EXIT_FAILURE);
   } else {
     /* Don't delete here or others DEBUG_MSG() 
@@ -141,11 +165,11 @@ int main() {
   }
 
   /* Mapping jtag memory from somewhere of memory to uio_port */
-  volatile jtag_t* xvc_jtag_mem_loc = (volatile jtag_t*) mmap(
+  volatile jtag_t* xvc_memobj = (volatile jtag_t*) mmap(
       NULL, kMapSize, PROT_READ | PROT_WRITE, 
       MAP_SHARED, xvc_fd_uio, 0);
-  if (xvc_jtag_mem_loc == MAP_FAILED) {
-    XVC_ERROR_MSG("Failed to Mapping from mem to Jtag port ");
+  if (xvc_memobj == MAP_FAILED) {
+    ERROR_MSG("Failed to Mapping from mem to Jtag port ");
     exit(EXIT_FAILURE);
   } else {
     DEBUG_MSG("mmap successed");
@@ -154,7 +178,7 @@ int main() {
   /* init fd to socket, use TCP mode */
   const fd_t xvc_fd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); 
   if (xvc_fd_socket == kUnixFailed) {
-    XVC_ERROR_MSG("Failed to Open Socket");
+    ERROR_MSG("Failed to Open Socket");
     exit(EXIT_FAILURE);
   } else {
     DEBUG_MSG("Socket opened");
@@ -166,7 +190,7 @@ int main() {
           &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
       kUnixFailed 
   ) {
-    XVC_ERROR_MSG("Failed to setsockopt");
+    ERROR_MSG("Failed to setsockopt");
     exit(EXIT_FAILURE);
   } else {
     DEBUG_MSG("setsockopt successed");
@@ -185,7 +209,7 @@ int main() {
             size_sock_addr) == 
       kUnixFailed
   ) {
-    XVC_ERROR_MSG("Failed to bind");
+    ERROR_MSG("Failed to bind");
     exit(EXIT_FAILURE);
   } else {
     DEBUG_MSG("bind successed");
@@ -193,13 +217,13 @@ int main() {
   
   /* Listen */
   if (listen(xvc_fd_socket, kLenBacklog) == kUnixFailed) {
-    XVC_ERROR_MSG("Failed to listen");
+    ERROR_MSG("Failed to listen");
     exit(EXIT_FAILURE);
   } else {
     DEBUG_MSG("listen successed");
   }
 
-  /* Only 1 eth-fd need to wait */
+  /* Only 1 eth_fd-fd need to wait */
   fd_t xvc_max_fd = xvc_fd_socket +1; 
   
   /* A connection (to prot-2542 of socket) in a set of fd */
@@ -219,10 +243,10 @@ int main() {
     const fd_t result_sel = select(xvc_max_fd, &rd, &wr, &except, &tv_block_cd);
     /* Check Result of select */
     if (result_sel == kSelectFailed) {
-      XVC_ERROR_MSG("Failed to Select");
+      ERROR_MSG("Failed to Select");
       exit(EXIT_FAILURE);
     } else if (result_sel == kSelectTimeOut) {
-      XVC_ERROR_MSG("Time out to Select");
+      ERROR_MSG("Time out to Select");
       exit(EXIT_FAILURE);
     } 
     
@@ -235,7 +259,7 @@ int main() {
                               (struct sockaddr*) &socket_addr, 
                               &size_sock_addr);
           if (newfd == kUnixFailed) {
-            XVC_ERROR_MSG("Failed to Accept New FD For Socket");
+            ERROR_MSG("Failed to Accept New FD For Socket");
             exit(EXIT_FAILURE);
           } else {
             DEBUG_MSG("Accept");  
@@ -244,7 +268,7 @@ int main() {
             if (setsockopt(newfd, IPPROTO_TCP, TCP_NODELAY, 
                     &kTcpNoDelayIsTrue, sizeof(kTcpNoDelayIsTrue) ) == 
                 kUnixFailed ) {
-              XVC_ERROR_MSG("setsockopt error for TCP_NODELAY");
+              ERROR_MSG("setsockopt error for TCP_NODELAY");
               exit(EXIT_FAILURE);
             } else {
               DEBUG_MSG("setsockopt successed for TCP_NODELAY");
@@ -256,15 +280,21 @@ int main() {
               FD_SET(newfd, &xvc_conn_set);
             } 
           }
-        } else if (FD_ISSET(fd_iter, &except) ) {
+        } else if (!JtagEthBridge(fd_iter, xvc_memobj) ) {
+          DEBUG_MSG("Connection closed");
+          close(fd_iter);
+          FD_CLR(fd_iter, &xvc_conn_set);
+        }        
+      } else if (FD_ISSET(fd_iter, &except) ) {
           /* if except occured */
-          XVC_ERROR_MSG("connection is except");
-          exit(EXIT_FAILURE);
-        } else {
-          JtagEthBridge(fd_iter, xvc_jtag_mem_loc);
-        }
+        ERROR_MSG("connection is except");
+        exit(EXIT_FAILURE);
+      } else {
+        ERROR_MSG("Failure: Unknow FD_ISSET()");
+        exit(EXIT_FAILURE);
       }
     }
   }
+  munmap((void *) xvc_memobj, kMapSize);
 }
 

@@ -68,32 +68,25 @@ kVivadoCLIArgs := \
 	-g ${kRunGuiAfterBuildHw}
 
 
-all: | start_msg init_dir ${kTargetXSA} end_msg
+################################################################################
+# Run area below #
+################################################################################
+
+.PHONY: \
+	all \
+	clean
+
+.NOTPARALLEL:
+
+all: ${kTargetXSA}
 ${kTargetXSA}: ${kDeps}
-	$(call InfoPrint,"Start to build hw...")
+	$(call InfoPrint,"Start to build xvc_hw") 
+	mkdir -p ${kBuildDir} ${kOutputDir}
 	${kVivadoCLI} ${kVivadoCLIFlags} \
 		-source ${kTopBuildScriptPath} \
 		-tclargs ${kVivadoCLIArgs}
-
-start_msg:
-	$(call InfoPrint,"Start to check/build xvc_hw")
-
-end_msg:
-	$(call InfoPrint,"Check/Build xvc_hw has completed")
-
-init_dir :
-	$(call InfoPrint,"Create OutDir and BuildDir for xvc_hw")
-	mkdir -p ${kBuildDir} ${kOutputDir}
+	$(call InfoPrint,"Build xvc_hw has completed")
 
 clean: 
 	$(call InfoPrint,"Clean xvc_hw build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}
-
-.PHONY: \
-	all \
-	start_msg \
-	end_msg \
-	init_dir \
-	clean
-
-

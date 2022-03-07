@@ -4,7 +4,6 @@ kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
-kSrcsDir := $(shell pwd)
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
@@ -21,13 +20,15 @@ kKernelSrcLocalPath := ${kBuildDir}/${kKernelSrcLocalDirName}
 kKernelConfName := xilinx_zynq_defconfig
 kUImgLoadAddr := 0x8000
 
-kUImageGenDir := ${kKernelSrcLocalPath}/arch/arm/boot/
-kUImageFileName := uImage
-kUImageGenPath := ${kUImageGenDir}/${kUImageFileName}
-################################################################################
-
 kTarget := $(basename $(notdir ${KERNEL_TARGET}))
-kTargetPath := ${kOutputDir}/${kTarget}
+kTargetExec := $(notdir ${KERNEL_TARGET})
+kTargetExecPath := ${kOutputDir}/${kTargetExec}
+
+kUImageGenDir := ${kKernelSrcLocalPath}/arch/arm/boot
+kUImageGenFileName := ${kTarget}
+kUImageGenPath := ${kUImageGenDir}/${kUImageGenFileName}
+
+################################################################################
 
 kDeps := \
 	${kTCLUtilitiesTopPath}
@@ -43,19 +44,32 @@ kBuildArgs := \
 
 kMakeUImageArgs := \
 	UIMAGE_LOADADDR=${kUImgLoadAddr} \
-	${kUImageFileName}
+	${kUImageGenFileName}
 
-all: | start_msg init_dir  build_kernel end_msg
 
-build_kernel: ${kTargetPath} 
-${kTargetPath}: ${kDeps} clone_remote_kernel_src
+################################################################################
+# Run area below #
+################################################################################
+
+.PHONY: \
+	all \
+	clone_remote_kernel_src \
+	clean 
+
+.NOTPARALLEL: all
+
+all: ${kTargetExecPath}
+${kTargetExecPath}: ${kDeps} clone_remote_kernel_src 
+	$(call InfoPrint,"Start to build xvc_os_kernel")
+	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${MAKE} -C ${kKernelSrcLocalPath} ${kKernelConfName}
 	${MAKE} -C ${kKernelSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kKernelSrcLocalPath} ${kMakeUImageArgs}
-	cp ${kUImageGenPath} ${kOutputDir}
+	cp ${kUImageGenPath} ${kTargetExecPath}
+	$(call InfoPrint,"Build xvc_os_kernel has completed")
 
 clone_remote_kernel_src:
-	$(call InfoPrint,"Check Remote repository...")
+	$(call InfoPrint,"Check Remote/Local Repository...")
 	@if [ ! -d ${kKernelSrcLocalPath} ]; then \
 		echo "Remote repository doesn't exist in local, cloning...";\
 		git clone \
@@ -68,24 +82,6 @@ clone_remote_kernel_src:
 		git pull ${kKernelSrcRemoteRepoUrl}; \
 	fi	
 
-init_dir:
-	mkdir -p ${kBuildDir} ${kOutputDir} 
-
-start_msg:
-	$(call InfoPrint,"Start to build kernel")
-
-end_msg: 
-	$(call InfoPrint,"Build kernel has completed")
-
-clean: 
-	$(call InfoPrint,"Clean kernel build/out directories")
+clean:
+	$(call InfoPrint,"Clean xvc_os_kernel build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}
-
-.PHONY: \
-	all \
-	init_dir \
-	clone_remote_kernel_src \
-	build_kernel \
-	clean \
-	start_msg \
-	end_msg 

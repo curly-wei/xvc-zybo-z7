@@ -273,16 +273,16 @@ int main(int argc, char **argv) {
       for (fd = 0; fd <= maxfd; ++fd) {
          if (FD_ISSET(fd, &read)) {
             if (fd == s) {
-               int newfd;
-               socklen_t nsize = sizeof(address);
+              int newfd;
+              socklen_t nsize = sizeof(address);
 
-               newfd = accept(s, (struct sockaddr*) &address, &nsize);
+              newfd = accept(s, (struct sockaddr*) &address, &nsize);
 
-//               if (verbose)
+              if (verbose)
                   printf("connection accepted - fd %d\n", newfd);
-               if (newfd < 0) {
+              if (newfd < 0) {
                   perror("accept");
-               } else {
+              } else {
             	    printf("setting TCP_NODELAY to 1\n");
             	  	int flag = 1;
             	  	int optResult = setsockopt(newfd,
@@ -296,9 +296,8 @@ int main(int argc, char **argv) {
                      maxfd = newfd;
                   }
                   FD_SET(newfd, &conn);
-               }
-            }
-            else if (handle_data(fd,ptr)) {
+              }
+            } else if (handle_data(fd,ptr)) {
 
                if (verbose)
                   printf("connection closed - fd %d\n", fd);

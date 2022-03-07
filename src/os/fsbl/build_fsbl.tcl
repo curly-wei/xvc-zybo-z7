@@ -53,11 +53,6 @@ file mkdir ${kBuildDir}
 set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
 
-#Output file(cp) properties
-set kFSBLGenDir "${kBuildDir}/${kAPPName}/Debug"
-set kFSBLGenFileName "${kAPPName}.elf"
-set kFSBLGenPath "${kFSBLGenDir}/${kFSBLGenFileName}"
-
 puts [InfoStr "create/set work(build) dir"]
 cd ${kBuildDir}
 setws ${kBuildDir}
@@ -99,9 +94,6 @@ app config \
 
 puts [InfoStr "build app"]
 app build -name ${kAPPName} 
-
-puts [InfoStr "export fsbl.elf file to output dir"]
-file copy -force ${kFSBLGenPath} ${kOutputDir}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 

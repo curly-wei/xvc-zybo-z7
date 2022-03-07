@@ -41,9 +41,11 @@ kReleaseFlags := -O2 -D RELEASE
 kCFlags := -std=c11 -Wall
 kLDFlags := -static
 
+.NOTPARALLEL: all
+
 default: debug_build
-debug_build: | start_msg init_dir ${kTargetExecDebug} end_msg
-release_build: | start_msg init_dir ${kTargetExecRelease} end_msg
+debug_build: start_msg init_dir ${kTargetExecDebug} end_msg
+release_build: start_msg init_dir ${kTargetExecRelease} end_msg
 
 ${kTargetExecDebug}: ${kObjDebug}
 	$(call InfoPrint,"Linking...")
@@ -65,7 +67,7 @@ start_msg:
 	$(call InfoPrint,"Start to check/build xvc_sw")
 
 end_msg:
-	$(call InfoPrint,"Check/Build xvc_sw has completed")
+	$(call InfoPrint,"Check/build xvc_sw has completed")
 
 init_dir: 
 	$(call InfoPrint,"Create OutDir and BuildDir for xvc_sw")

@@ -40,7 +40,7 @@ kBuildDirSw := ${kBuildDir}/build_sw
 kBuildDirOsDT := ${kBuildDir}/build_dt
 kBuildDirOsFSBL := ${kBuildDir}/build_fsbl
 kBuildDirOsKernel := ${kBuildDir}/build_kernel
-kBuildDirOsUBoot := ${kBuildDir}/build_uboot
+kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
 
 #########################
@@ -52,7 +52,7 @@ VIVADO_CLI ?= vivado
 XSCT_CLI ?= xsct
 
 
-CROSS_COMPILE ?= arm-linux-gnueabihf-
+CROSS_COMPILE ?= arm-none-linux-gnueabihf-
 ARCH ?= arm
 
 
@@ -105,8 +105,12 @@ kSwBuildArgs := \
 # property for build dt #
 #########################
 
+kDTTarget := devicetree.dtb
+kDTTargetPath := ${kOutDirOsDT}/${kDTTarget}
+
 kDTBuildScriptDir := ${kSrcDirOs}/dt
 kDTBuildArgs := \
+	DT_TARGET= ${kDTTargetPath} \
 	BUILD_DIR=${kBuildDirOsDT} \
 	OUTPUT_DIR=${kOutDirOsDT} \
 	XSCT_CLI=${XSCT_CLI} \
@@ -117,7 +121,7 @@ kDTBuildArgs := \
 # property for build fsbl #
 ###########################
 
-kFSBLTarget := xvc_server_fsbl.elf
+kFSBLTarget := fsbl.elf
 kFSBLTargetPath := ${kOutDirOsFSBL}/${kFSBLTarget}
 
 kFSBLBuildScriptDir := ${kSrcDirOs}/fsbl
@@ -133,7 +137,7 @@ kFSBLBuildArgs := \
 # property for build kernel #
 #############################
 
-kKernelTarget := uImage
+kKernelTarget := uImage.bin
 kKernelTargetPath := ${kOutDirOsKernel}/${kKernelTarget}
 
 kKernelBuildScriptDir := ${kSrcDirOs}/kernel
@@ -145,15 +149,40 @@ kKernelBuildArgs := \
 	ARCH=${ARCH} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
-################################################################################
-#########
-# build #
-#########
-################################################################################
+#############################
+# property for build Uboot #
+#############################
 
+kUbootTarget := u-boot.elf
+kUbootTargetPath := ${kOutDirOsUboot}/${kUbootTarget}
+
+kUbootBuildScriptDir := ${kSrcDirOs}/uboot
+kUbootlBuildArgs := \
+	UBOOT_TARGET=${kUbootTargetPath} \
+	BUILD_DIR=${kBuildDirOsUboot} \
+	OUTPUT_DIR=${kOutDirOsUboot} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
+
+##############################
+# property for build Busybox #
+##############################
+
+kBusyboxBuildScriptDir := ${kSrcDirOs}/busybox
+kBusyboxBuildArgs := \
+	BUILD_DIR=${kBuildDirOsBusybox} \
+	OUTPUT_DIR=${kOutDirOsBusybox} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+################################################################################
 ###################
 # Check build env #
 ###################
+################################################################################
 necessary_exec_prog := \
 	${VIVADO_CLI} \
 	${CROSS_COMPILE}gcc \
@@ -164,14 +193,45 @@ necessary_exec_prog := \
 chk_env := $(foreach exec,$(necessary_exec_prog),\
 	$(if $(shell which $(exec)),"Found $(exec); ",$(error "No $(exec) in PATH")))
 
-#############
-# All build #
-#############
 
-all: \
-	build_hw build_sw \
-	gen_base_dt build_fsbl \
-	build_kernel build_uboot build_busybox
+################################################################################
+#########
+# PHONY #
+#########
+################################################################################
+
+.PHONY: \
+	clean_hw \
+	clean_sw \
+	clean_dt \
+	clean_fsbl \
+	clean_kernel \
+	clean_uboot \
+	clean_busybox\
+	clean_bootimg \
+	clean_rootfs \
+	distclean \
+	all \
+	build_hw \
+	build_sw \
+	build_dt \
+	build_fsbl \
+	build_kernel \
+	build_uboot \
+	build_busybox \
+	make_bootimg
+
+################################################################################
+#########
+# build #
+#########
+################################################################################
+
+all: make_rootfs
+
+make_rootfs: make_bootimg build_busybox
+
+make_bootimg: build_fsbl build_dt build_kernel build_uboot 
 
 build_hw: 
 	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
@@ -179,7 +239,7 @@ build_hw:
 build_sw: 
 	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
 
-gen_base_dt: build_hw
+build_dt: build_hw
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
 
 build_fsbl: build_hw
@@ -189,8 +249,10 @@ build_kernel:
 	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs}
 
 build_uboot:
+	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs}
 
-build_busybox:
+build_busybox: 
+	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
 
 ################################################################################
 #########
@@ -208,31 +270,19 @@ clean_fsbl:
 	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs} clean
 clean_kernel:
 	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
+clean_uboot:
+	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs} clean
+clean_busybox:
+	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs} clean
+clean_bootimg:
+
+clean_rootfs:
 
 distclean: \
 	clean_hw \
 	clean_sw \
 	clean_dt \
 	clean_fsbl \
-	clean_kernel
-
-################################################################################
-#########
-# PHONY #
-#########
-################################################################################
-
-.PHONY: \
-	clean_hw \
-	clean_sw \
-	clean_dt \
-	distclean \
-	all \
-	build_hw \
-	build_sw \
-	gen_base_dt \
-	build_fsbl \
-	build_kernel \
-	build_uboot \
-	build_busybox
-	
+	clean_kernel \
+	clean_uboot \
+	clean_busybox

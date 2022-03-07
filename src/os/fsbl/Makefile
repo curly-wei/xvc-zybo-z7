@@ -22,7 +22,12 @@ kBuildTCLScriptPath := ${kSrcsDir}/${kBuildTCLScript}
 kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
 
 kTarget := $(basename $(notdir ${FSBL_TARGET}))
-kTargetExec := ${kOutputDir}/${kTarget}.elf
+kTargetExec := $(notdir ${FSBL_TARGET})
+kTargetExecPath := ${kOutputDir}/${kTargetExec}
+
+kFSBLGenDir := ${kBuildDir}/${kTarget}/Debug
+kFSBLGenFileName := ${kTargetExec}
+kFSBLGenPath := ${kFSBLGenDir}/${kFSBLGenFileName}
 
 kDeps := \
 	${kXSASrcsPath} \
@@ -38,30 +43,25 @@ kXsctCLIArgs := \
 	-U ${kTCLUtilitiesTopPath} \
 	-x ${kXSASrcsPath} 
 
-all: | start_msg init_dir build_fsbl end_msg
 
-build_fsbl: ${kTargetExec} 
-${kTargetExec}: ${kDeps}
-	${kXsctCLI} ${kBuildTCLScriptPath} ${kXsctCLIArgs}
+################################################################################
+# Run area below #
+################################################################################
 
-start_msg:
+.PHONY: \
+	all \
+	clean \
+
+.NOTPARALLEL:
+
+all: ${kTargetExecPath}
+${kTargetExecPath}: ${kDeps}
 	$(call InfoPrint,"Start to build fsbl")
-
-end_msg:
-	$(call InfoPrint,"Build fsbl has completed")
-
-init_dir:
 	mkdir -p ${kBuildDir} ${kOutputDir} 
+	${kXsctCLI} ${kBuildTCLScriptPath} ${kXsctCLIArgs}
+	cp ${kFSBLGenPath} ${kTargetExecPath}
+	$(call InfoPrint,"Build fsbl has completed")
 
 clean:
 	$(call InfoPrint,"Clean xvc_os_fsbl build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir} 
-
-.PHONY: \
-	all \
-	init_dir \
-	build_fsbl \
-	clean \
-	start_msg \
-	end_msg \
-	init_dir
