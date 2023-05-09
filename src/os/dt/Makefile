@@ -39,9 +39,11 @@ kBuildDTSrcsPath := \
 ################################################################################
 
 kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
+kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
 
 kDepsBaseDT := \
 	${kXSASrcsPath} \
+	${kMKUtilitiesTopPath} \
 	${kTCLUtilitiesTopPath}
 
 kDepsBuildDT := \
@@ -76,7 +78,7 @@ build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
 ${kTargetExecPath}: 
 
 
-gen_base_dt: ${kDepsBaseDT}  clone_remote_dt_src 
+gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src 
 	$(call InfoPrint,"Start to build dt")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${kXsctCLI} ${kBuildTCLScript} ${kXsctCLIArgs}

@@ -4,6 +4,8 @@ kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
+kSrcsDir := $(shell pwd)
+
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
@@ -11,6 +13,11 @@ kOutputDir := ${OUTPUT_DIR}
 ########################
 ## Please cheack here ##
 ########################
+
+kFSTabPath := ${kSrcsDir}/fstab
+kFSTabOutDest := ${kOutputDir}/etc/fstab
+
+kSrcs := ${kFSTabPath}
 
 kTarget := busybox
 
@@ -40,8 +47,11 @@ kRootFolders := \
 
 ################################################################################
 
+kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+
 kDeps := \
-	${kTCLUtilitiesTopPath}
+	${kSrcs}	\
+	${kMKUtilitiesTopPath}
 
 # Compiler
 kCC := ${CROSS_COMPILE}
@@ -64,22 +74,22 @@ kMakeUImageArgs := \
 
 .PHONY: \
 	all \
-	clone_remote_kernel_src \
+	clone_remot_busybox_src \
 	clean 
 
-all: clone_busybox_src
+all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBusyboxConfName}
 	${MAKE} -C ${kBusyboxSrcLocalPath}
 	${MAKE} -C ${kBusyboxSrcLocalPath} install
-	# @for i in ${kRootFolders}; do \
-	# 	mkdir -p ${kBusyboxGenFsDirPath}/$${i}; \
-	# done	
+	@for i in ${kRootFolders}; do \
+	 	mkdir -p ${kBusyboxGenFsDirPath}/$${i}; \
+	done	
 	cp -r ${kBusyboxGenFsDirPath}/* ${kOutputDir}
+	cp ${kFSTabPath} ${kFSTabOutDest}
 
-
-clone_busybox_src:
+clone_remot_busybox_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
 	@if [ ! -d ${kBusyboxSrcLocalPath} ]; then \
 		echo "Remote repository doesn't exist in local, cloning...";\

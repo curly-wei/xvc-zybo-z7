@@ -4,10 +4,6 @@
 
 Regarding source_mgmt_mode, see
 
-<https://tinyurl.com/4b7xyvxs>
-
-and
-
 <https://www.xilinx.com/support/answers/69846.html>
 
 and
@@ -32,11 +28,11 @@ Before write_hw_platform, must run
 
 furthermore, can't use read_bd ${bd_file_and_path}
 
-reason Refer to [here](https://www.xilinx.com/support/answers/60945.html)
+reason Refer to [here](https://support.xilinx.com/s/question/0D52E00007G0pJYSAZ/whats-usage-of-readcheckpoint?language=en_US)
 
 ## 4 About `Critical warning of DDR clk to dqs seem can be ignore`
 
-[Refer to here](https://tinyurl.com/t45wsu4v)
+[Refer to here](https://github.com/Digilent/vivado-boards/issues/20)
 
 It seems can be ignore.
 

@@ -61,7 +61,7 @@
  */
 #define _ERROR_MSG_DETAIL(msg_str) \
   do { \
-    fprintf(stderr, "%s: %s\n, at #%d, file: %s\n", \
+    fprintf(stderr, "%s: %s\n, at line: %d, file: %s\n", \
             (msg_str), strerror(errno), __LINE__, __FILE__); \
   } while(0)
 
@@ -166,6 +166,7 @@ static inline bool JtagEthBridge(const fd_t eth_fd, volatile jtag_t* jtag) {
       tms = 0;
 
       if (byte_left < 4) {
+        /* Copy > a word */
         memcpy(&tms, &buffer[byte_index], byte_left);
         memcpy(&tdi, &buffer[byte_index + kNByteRd], byte_left);
         
@@ -180,6 +181,7 @@ static inline bool JtagEthBridge(const fd_t eth_fd, volatile jtag_t* jtag) {
         break;
 
       } else {
+        /* Copy remaining */
         memcpy(&tms, &buffer[byte_index], 4);
         memcpy(&tdi, &buffer[byte_index + kNByteRd], 4);
         
@@ -192,7 +194,7 @@ static inline bool JtagEthBridge(const fd_t eth_fd, volatile jtag_t* jtag) {
         memcpy(&result[byte_index], &tdo, 4);
 
         byte_left -= 4;
-        bit_left -=32;
+        bit_left -= 32;
         byte_index += 4;
       }
     
@@ -296,8 +298,8 @@ int main() {
   if (listen(xvc_fd_socket, kLenBacklog) == kUnixFailed) 
     goto pre_err;
 
-  /* Only 1 eth_fd-fd need to wait */
-  fd_t xvc_max_fd = xvc_fd_socket +1; 
+  /* Only 1 eth_fd-fd need to be wait */
+  fd_t max_fd = xvc_fd_socket +1; 
   
   /* A connection (to prot-2542 of socket) in a set of fd */
   fd_set xvc_conn_set; 
@@ -308,69 +310,69 @@ int main() {
     .tv_usec = 0
   }; 
 
-  enum IOState io_state = kStart;
+  /* Start to do real I/O */
   while (true) {
     FD_ZERO(&xvc_conn_set);
     FD_SET(xvc_fd_socket, &xvc_conn_set);
     fd_set rd = xvc_conn_set, wr = xvc_conn_set, except = xvc_conn_set;
 
-    /* Wait event rd/wr/except from xvc_max_fd */
-    const fd_t result_sel = select(xvc_max_fd, &rd, &wr, &except, &tv_block_cd);
+    /* Wait event rd/wr/except from max_fd */
+    const fd_t result_sel = select(max_fd, &rd, &wr, &except, &tv_block_cd);
     /* Check Result of select */
     if (result_sel == -1) {
-      io_state = kSelectFail;
-      goto io_err;
+      ERROR_MSG("Failed to Select");
     } else if (result_sel == 0) {
-      io_state = kSelectTimeOut;
-      goto io_err;
-    } 
-    
-    /* Scan all fd after select() returned */
-    for (fd_t fd_iter = 0; fd_iter <= xvc_max_fd; fd_iter++) { 
-      /* if find the socket which is we care */
-      if (FD_ISSET(fd_iter, &rd) ) {
-        if (fd_iter == xvc_fd_socket) {
-          const fd_t newfd = accept(xvc_fd_socket, 
-                              (struct sockaddr*) &socket_addr, 
-                              &size_sock_addr);
-          if (newfd == kUnixFailed) {
-            ERROR_MSG("Failed to Accept New FD For Socket");
-            exit(EXIT_FAILURE);
-          } else {
-            DEBUG_MSG("Accept");  
-            const char kTcpNoDelayIsTrue = 1;
-            /* Disable Nagle Algorithm */
-            if (setsockopt(newfd, IPPROTO_TCP, TCP_NODELAY, 
-                    &kTcpNoDelayIsTrue, sizeof(kTcpNoDelayIsTrue) ) == 
-                kUnixFailed ) {
-              ERROR_MSG("setsockopt error for TCP_NODELAY");
-              exit(EXIT_FAILURE);
+      ERROR_MSG("Select is timeout");
+    } else {    
+      /* Scan all fd after select() returned */
+      for (fd_t fd_iter = 0; fd_iter <= max_fd; fd_iter++) { 
+        /* if find the socket which is we care */
+        if (FD_ISSET(fd_iter, &rd) ) {
+          if (fd_iter == xvc_fd_socket) {
+            const fd_t newfd = accept(xvc_fd_socket, 
+                                (struct sockaddr*) &socket_addr, 
+                                &size_sock_addr);
+            if (newfd == kUnixFailed) {
+              ERROR_MSG("Failed to Accept New FD For Socket");
             } else {
-              DEBUG_MSG("setsockopt successed for TCP_NODELAY");
-              /* Replace old fd (without set to TCP_NODELAY) 
-               * with new fd which can bobble up to top of fd_iter
-               */
-              if (newfd > xvc_max_fd)
-                xvc_max_fd = newfd;
-              FD_SET(newfd, &xvc_conn_set);
-            } 
-          }
-        } else if (!JtagEthBridge(fd_iter, xvc_memobj) ) {
-          DEBUG_MSG("Connection closed");
+              DEBUG_MSG("Accept");  
+              const char kTcpNoDelayIsTrue = 1;
+              /* Disable Nagle Algorithm */
+              if (setsockopt(newfd, IPPROTO_TCP, TCP_NODELAY, 
+                      &kTcpNoDelayIsTrue, sizeof(kTcpNoDelayIsTrue) ) == 
+                  kUnixFailed ) {
+                ERROR_MSG("setsockopt error for TCP_NODELAY");
+              } else {
+                DEBUG_MSG("setsockopt successed for TCP_NODELAY");
+                /* Replace old fd (without set to TCP_NODELAY) 
+                  * with new fd which can bobble up to top of fd_iter
+                  */
+                if (newfd > max_fd)
+                  max_fd = newfd;
+                FD_SET(newfd, &xvc_conn_set);
+              } 
+            }
+          } else if (!JtagEthBridge(fd_iter, xvc_memobj) ) {
+            DEBUG_MSG("Connection closed");
+            close(fd_iter);
+            FD_CLR(fd_iter, &xvc_conn_set);
+          }        
+        } else if (FD_ISSET(fd_iter, &except) ) {
+            /* if except occured */
+          ERROR_MSG("FD_ISSET has exception");
           close(fd_iter);
           FD_CLR(fd_iter, &xvc_conn_set);
-        }        
-      } else if (FD_ISSET(fd_iter, &except) ) {
-          /* if except occured */
-        ERROR_MSG("connection is except");
-        exit(EXIT_FAILURE);
-      } else {
-        ERROR_MSG("Failure: Unknow FD_ISSET()");
-        exit(EXIT_FAILURE);
+          exit(EXIT_FAILURE);
+        } else {
+          ERROR_MSG("Failure: Unknow FD_ISSET()");
+          close(fd_iter);
+          FD_CLR(fd_iter, &xvc_conn_set);
+          exit(EXIT_FAILURE);
+        }
       }
     }
   }
-  exit(EXIT_SUCCESS);
+  exit(EXIT_FAILURE); /* End of main code*/
 
 pre_err:
   switch(pre_state) {
@@ -401,33 +403,5 @@ pre_err:
   }
   exit(EXIT_FAILURE);
 
-io_err:
-  switch(io_state) {
-    case kSelectFail: 
-      ERROR_MSG("Failed to Select");
-      break;
-    case kSelectTimeOut: 
-      ERROR_MSG("Select is timeout");
-      break;
-    case kInitSocket:      
-      ERROR_MSG("Failed to Open Socket");
-      break;
-    case kSetSocketOpt: 
-      ERROR_MSG("Failed to setsockopt");
-      break;
-    case kSetSocketPort: 
-      ERROR_MSG("Buffer size exceeded"); 
-      break;
-    case kBindSocket: 
-      ERROR_MSG("Failed to bind");
-      break;
-    case kListenSocket: 
-      ERROR_MSG("Failed to listen");
-      break;
-    default:
-      ERROR_MSG("Unknow error when io");
-      break;
-  }
-  exit(EXIT_FAILURE);
 }
 

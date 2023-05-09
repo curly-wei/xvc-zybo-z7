@@ -4,46 +4,33 @@ package require cmdline
 set parameters {
   {B.arg "" "Build Dir"}
   {O.arg "" "Output Dir"}
-  {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
   {t.arg "" "BD-Target Name"}
+  {U.arg "" "Path to XVC-TCL-Utilities-Dir"}
   {f.arg "" "FPGA Part"}
   {v.arg "" "Path to VerilogHDL-Files"}
   {x.arg "" "Path to XDC-Files"}
   {b.arg "" "Path to Top-BD-Script-File"}
   {p.arg "" "Path to PS-Preset-Script-File"}
-  {g.arg "false" "Run Gui after build, default false"}
 }
 
 array set arg [cmdline::getoptions argv ${parameters}]
 
-set requiredParameters {B O t f v x b p U g}
+set requiredParameters {B O t U f v x b p}
 foreach iter ${requiredParameters} {
   if {$arg(${iter}) == ""} {
     error "Missing required parameter: -${iter}"
   } else {
-    if {$arg(${iter}) == $arg(B)} {
-      set kBuildDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(O)} {
-      set kOutputDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(U)} {
-      set kTCLUtilitiesTopDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(t)} {
-      set kBDName $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(f)} {
-      set kFPGAPart $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(v)} {
-      set kVerilogFiles $arg(${iter}) 
-    } elseif {$arg(${iter}) == $arg(x)} {
-      set kXDCFiles $arg(${iter}) 
-    } elseif {$arg(${iter}) == $arg(b)} {
-      set kTopBDScriptFile $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(p)} {
-      set kPSPresetFile $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(g)} {
-      set kRunGuiAfterBuild $arg(${iter})
-    } else {
-      error "Input arguments error"
-    }
+    switch $arg(${iter}) \
+      $arg(B) { set kBuildDir $arg(${iter}) }\
+      $arg(O) { set kOutputDir $arg(${iter}) }\
+      $arg(t) { set kBDName $arg(${iter})}\
+      $arg(U) { set kTCLUtilitiesTopDir $arg(${iter}) }\
+      $arg(f) { set kFPGAPart $arg(${iter}) }\
+      $arg(v) { set kVerilogFiles $arg(${iter}) }\
+      $arg(x) { set kXDCFiles $arg(${iter}) }\
+      $arg(b) { set kTopBDScriptFile $arg(${iter}) }\
+      $arg(p) { set kPSPresetFile $arg(${iter}) }\
+      default { error "Input arguments error" }
   }
 }
 # include ErrStr and InfoStr
@@ -198,12 +185,6 @@ validate_hw_platform -verbose "${kOutputDir}/${kBDName}.xsa"
 puts [InfoStr "---------------------------------------------"]
 puts [InfoStr "Run Vivado to build XVC HW has completed"]
 puts [InfoStr "---------------------------------------------"]
-
-# After build, start gui to check (optional)
-if {${kRunGuiAfterBuild} == "true"} {
-  puts [InfoStr "Run Gui..."]
-  start_gui
-}
 
 
 # Refer to here

@@ -17,19 +17,13 @@ foreach iter ${requiredParameters} {
   if {$arg(${iter}) == ""} {
     error "Missing required parameter: -${iter}"
   } else {
-    if {$arg(${iter}) == $arg(B)} {
-      set kBuildDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(O)} {
-      set kOutputDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(U)} {
-      set kTCLUtilitiesTopDir $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(x)} {
-      set kXSAFilePath $arg(${iter})
-    } elseif {$arg(${iter}) == $arg(R)} {
-      set kXilDTSrcLocalPath $arg(${iter})
-    } else {
-      error "Input arguments error"
-    }
+    switch $arg(${iter}) \
+      $arg(B) { set kBuildDir $arg(${iter}) }\
+      $arg(O) { set kOutputDir $arg(${iter}) } \
+      $arg(U) { set kTCLUtilitiesTopDir $arg(${iter}) }\
+      $arg(x) { set kXSAFilePath $arg(${iter}) }\
+      $arg(R) { set kXilDTSrcLocalPath $arg(${iter}) }\
+      default { error "Input arguments error" }
   }
 }
 

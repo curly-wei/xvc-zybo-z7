@@ -75,16 +75,6 @@ enum PreactionState {
   kListenSocket = 7
 };
 
-/**
- * @brief State tag for main prgo: Select
- */
-enum IOState {
-  kStart = 0,
-  kSelectFail = 1,
-  kSelectTimeOut = 2,
-
-};
-
 
 
 #endif

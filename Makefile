@@ -32,6 +32,7 @@ kOutDirOsFSBL := ${kOutDir}/fsbl
 kOutDirOsKernel := ${kOutDir}/kernel
 kOutDirOsUboot := ${kOutDir}/uboot
 kOutDirOsBusybox := ${kOutDir}/busybox
+kOutDirOsBootimg  := ${kOutDir}/bootimg
 
 # Build Dirs
 kBuildDirHw := ${kBuildDir}/build_hw
@@ -42,6 +43,7 @@ kBuildDirOsFSBL := ${kBuildDir}/build_fsbl
 kBuildDirOsKernel := ${kBuildDir}/build_kernel
 kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
+kBuildOsBootimg := ${kBuildDir}/bootimg
 
 #########################
 # property for Compiler #
@@ -52,7 +54,7 @@ VIVADO_CLI ?= vivado
 XSCT_CLI ?= xsct
 
 
-CROSS_COMPILE ?= arm-none-linux-gnueabihf-
+CROSS_COMPILE ?= arm-linux-gnueabihf-
 ARCH ?= arm
 
 
@@ -72,8 +74,6 @@ kUtilitiesTopPath := ${kSrcDir}/utilities
 # property for build hw #
 #########################
 
-RUN_GUI_AFTER_BULD_HW ?= false
-
 kHwTarget := xvc_server_hw.xsa
 kHwTargetPath := ${kOutDirHw}/${kHwTarget}
 
@@ -83,7 +83,6 @@ kHwBuildArgs := \
 	BUILD_DIR=${kBuildDirHw} \
 	OUTPUT_DIR=${kOutDirHw} \
 	VIVADO_CLI=${VIVADO_CLI} \
-	RUN_GUI_AFTER_BULD_HW=${RUN_GUI_AFTER_BULD_HW} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 #########################
@@ -178,6 +177,19 @@ kBusyboxBuildArgs := \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 
+##############################
+# property for bootimg #
+##############################
+
+kBootimgBuildScriptDir := ${kSrcDirOs}/bootimg
+kBootimgBuildArgs := \
+	BUILD_DIR=${kBuildOsBootimg} \
+	OUTPUT_DIR=${kOutDirOsBootimg} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
 ################################################################################
 ###################
 # Check build env #
@@ -229,9 +241,7 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 
 all: make_rootfs
 
-make_rootfs: make_bootimg build_busybox
-
-make_bootimg: build_fsbl build_dt build_kernel build_uboot 
+make_rootfs: build_bootimg build_busybox
 
 build_hw: 
 	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
@@ -254,6 +264,9 @@ build_uboot:
 build_busybox: 
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
 
+build_bootimg: build_fsbl build_dt build_kernel build_uboot 
+	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} 
+
 ################################################################################
 #########
 # Clean #
@@ -275,7 +288,7 @@ clean_uboot:
 clean_busybox:
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs} clean
 clean_bootimg:
-
+	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} clean
 clean_rootfs:
 
 distclean: \

@@ -5,7 +5,7 @@
 * Only support Linux enviroment for build
 * linux-api-headers
 * pacutils
-* [Linaro GCC Compiler version 7.5, arm-linux-gnueabihf](https://www.linaro.org/downloads/)
+* [Linaro GCC Compiler version 13, arm-linux-gnueabihf](https://snapshots.linaro.org/gnu-toolchain)
 
 ## 1 To build sw
 

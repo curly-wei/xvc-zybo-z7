@@ -30,8 +30,11 @@ kTargetExecRelease := ${kOutputDir}/${kTarget}.elf
 kObjDebug := ${kBuildDir}/${kTarget}-d.o
 kObjRelease := ${kBuildDir}/${kTarget}.o
 
+kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+
 kDeps := \
 	${kCSrcsPath} \
+	${kMKUtilitiesTopPath} \
 	${kCHeadersPath}
 
 # Compiler

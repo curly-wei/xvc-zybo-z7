@@ -31,8 +31,9 @@ kUbootGenFilePath := ${kUbootGenDir}/${kUbootGenFileName}
 
 ################################################################################
 
+kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
 kDeps := \
-	${kTCLUtilitiesTopPath}
+	${kMKUtilitiesTopPath}
 
 # Compiler
 kCC := ${CROSS_COMPILE}

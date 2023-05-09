@@ -34,8 +34,7 @@ kTopBuildScriptPath := ${kScriptsDir}/${kTopBuildScript}
 kBuildScriptBDPath := ${kScriptsDir}/${kBuildScriptBD}
 kBuildScriptPSPresetPath := ${kScriptsDir}/${kBuildScriptPSPreset}
 kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
-
-kRunGuiAfterBuildHw := ${RUN_GUI_AFTER_BULD_HW}
+kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
 
 kTarget := $(basename $(notdir ${HW_TARGET}))
 kTargetXSA := ${HW_TARGET}
@@ -46,6 +45,7 @@ kDeps := \
 	${kTopBuildScriptPath} \
 	${kBuildScriptBDPath} \
 	${kBuildScriptPSPresetPath} \
+	${kMKUtilitiesTopPath} \
 	${kTCLUtilitiesTopPath}
 
 # Compiler
@@ -64,8 +64,7 @@ kVivadoCLIArgs := \
 	-x "${kXDCSrcsPath}" \
 	-b ${kBuildScriptBDPath} \
 	-p ${kBuildScriptPSPresetPath} \
-	-U ${kTCLUtilitiesTopPath} \
-	-g ${kRunGuiAfterBuildHw}
+	-U ${kTCLUtilitiesTopPath}
 
 
 ################################################################################
