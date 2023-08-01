@@ -27,6 +27,7 @@ foreach iter ${requiredParameters} {
   }
 }
 
+
 # include ErrStr and InfoStr
 source ${kTCLUtilitiesTopDir}/color_render.tcl
 
@@ -64,6 +65,10 @@ domain create \
   -name ${kDomainName} \
   -os standalone \
   -proc ps7_cortexa9_0
+
+puts [InfoStr "active domain"]
+domain active \
+  ${kDomainName}
 
 puts [InfoStr "set bsplib xilffs"]
 bsp setlib xilffs
