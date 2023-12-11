@@ -47,7 +47,6 @@ kBuildArgs := \
 # Run area below #
 ################################################################################
 
-
 .PHONY: \
 	all \
 	clone_remote_uboot_src \
@@ -62,7 +61,7 @@ ${kTargetExecPath}: ${kDeps} clone_remote_uboot_src
 	${MAKE} -C ${kUbootSrcLocalPath} ${kUbootConfName}
 	${MAKE} -C ${kUbootSrcLocalPath} ${kBuildArgs}
 	cp ${kUbootGenFilePath} ${kTargetExecPath}
-	$(call InfoPrint,"Build xvc_os_uboot has completed")
+	$(call InfoPrint,"Build xvc_os_uboot has been completed")
 
 clone_remote_uboot_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")

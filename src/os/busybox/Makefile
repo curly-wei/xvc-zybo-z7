@@ -80,9 +80,9 @@ kMakeUImageArgs := \
 all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBusyboxConfName}
-	${MAKE} -C ${kBusyboxSrcLocalPath}
-	${MAKE} -C ${kBusyboxSrcLocalPath} install
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBusyboxConfName} ${kBuildArgs}
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs}
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} install
 	@for i in ${kRootFolders}; do \
 	 	mkdir -p ${kBusyboxGenFsDirPath}/$${i}; \
 	done	

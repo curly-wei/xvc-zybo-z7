@@ -84,7 +84,7 @@ ${kTargetXSA}: ${kDeps}
 	${kVivadoCLI} ${kVivadoCLIFlags} \
 		-source ${kTopBuildScriptPath} \
 		-tclargs ${kVivadoCLIArgs}
-	$(call InfoPrint,"Build xvc_hw has completed")
+	$(call InfoPrint,"Build xvc_hw has been completed")
 
 clean: 
 	$(call InfoPrint,"Clean xvc_hw build/out directories")

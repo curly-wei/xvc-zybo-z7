@@ -12,7 +12,8 @@ kOutputDir := ${OUTPUT_DIR}
 ## Please cheack here ##
 ########################
 
-kKernelSrcRemoteRepoUrl := https://github.com/Xilinx/linux-xlnx.git 
+#kKernelSrcRemoteRepoUrl := https://github.com/Xilinx/linux-xlnx.git 
+kKernelSrcRemoteRepoUrl := https://gitlab.com/linux-kernel/linux
 kKernelSrcRemoteBranchTag := master
 kKernelSrcLocalDirName := kernel_src
 kKernelSrcLocalPath := ${kBuildDir}/${kKernelSrcLocalDirName}
@@ -57,17 +58,17 @@ kMakeUImageArgs := \
 	clone_remote_kernel_src \
 	clean 
 
-.NOTPARALLEL: all
+.NOTPARALLEL:
 
 all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} clone_remote_kernel_src 
 	$(call InfoPrint,"Start to build xvc_os_kernel")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kKernelSrcLocalPath} ${kKernelConfName}
+	${MAKE} -C ${kKernelSrcLocalPath} ${kBuildArgs} ${kKernelConfName}
 	${MAKE} -C ${kKernelSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kKernelSrcLocalPath} ${kMakeUImageArgs}
 	cp ${kUImageGenPath} ${kTargetExecPath}
-	$(call InfoPrint,"Build xvc_os_kernel has completed")
+	$(call InfoPrint,"Build xvc_os_kernel has been completed")
 
 clone_remote_kernel_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
