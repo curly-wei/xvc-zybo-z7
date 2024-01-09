@@ -1,5 +1,7 @@
 # XVC for zybo-z7
 
+![architecture_picture](./doc/rsc/jtag-rj45.png)
+
 Refer to Xilinx official documentation:
 [Xiilnx Virtual Cable(XVC)](https://tinyurl.com/335zc6x5),
 

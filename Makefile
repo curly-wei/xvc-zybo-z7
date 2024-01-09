@@ -109,7 +109,7 @@ kDTTargetPath := ${kOutDirOsDT}/${kDTTarget}
 
 kDTBuildScriptDir := ${kSrcDirOs}/dt
 kDTBuildArgs := \
-	DT_TARGET= ${kDTTargetPath} \
+	DT_TARGET=${kDTTargetPath} \
 	BUILD_DIR=${kBuildDirOsDT} \
 	OUTPUT_DIR=${kOutDirOsDT} \
 	XSCT_CLI=${XSCT_CLI} \

@@ -1,6 +1,6 @@
 # FAQ for build hw
 
-## 1 About `set_property DEFAULT_LIB work [current_project]`
+## 1 About `set_property source_mgmt_mode All [current_project]`
 
 Regarding source_mgmt_mode, see
 

@@ -54,7 +54,7 @@ set_property DEFAULT_LIB work [current_project]
 # Regarding source_mgmt_mode, see
 # doc/faq/hw_script_faq.md
 # chapter
-# 1.1 About `set_property DEFAULT_LIB work [current_project]`
+# 1.1 About `set_property source_mgmt_mode All [current_project]`
 set_property source_mgmt_mode All [current_project]
 
 set_param general.maxThreads [NThreadsRunVivado]

@@ -47,7 +47,7 @@ kDepsBaseDT := \
 	${kTCLUtilitiesTopPath}
 
 kDepsBuildDT := \
-	${kBuildDTSrcsPath}
+	${kBuildDTSrcsPath} \
 	${kTCLUtilitiesTopPath}
 
 # Compiler
@@ -72,10 +72,10 @@ kXsctCLIArgs := \
 
 .NOTPARALLEL:
 
-all: build_dt
+#all: gen_base_dt
 
-build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
-${kTargetExecPath}: 
+#build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
+#	${kTargetExecPath}: 
 
 
 gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src 
