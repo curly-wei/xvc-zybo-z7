@@ -1,5 +1,0 @@
-image : {
-      [bootloader]fsbl.elf
-      fpga.bit
-      u-boot.elf
-}

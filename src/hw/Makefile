@@ -75,7 +75,7 @@ kVivadoCLIArgs := \
 	all \
 	clean
 
-.NOTPARALLEL:
+#.NOTPARALLEL:
 
 all: ${kTargetXSA}
 ${kTargetXSA}: ${kDeps}

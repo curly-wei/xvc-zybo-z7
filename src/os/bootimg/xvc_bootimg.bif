@@ -1,0 +1,6 @@
+//arch = zynq; split = false; format = BIN
+xvc_bootimg: {
+    [bootloader]fsbl.elf
+    xvc_server_hw.bit
+    u-boot.elf
+}

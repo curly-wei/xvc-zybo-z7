@@ -43,7 +43,7 @@ kBuildDirOsFSBL := ${kBuildDir}/build_fsbl
 kBuildDirOsKernel := ${kBuildDir}/build_kernel
 kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
-kBuildOsBootimg := ${kBuildDir}/bootimg
+kBuildDirOsBootimg := ${kBuildDir}/bootimg
 
 #########################
 # property for Compiler #
@@ -181,12 +181,17 @@ kBusyboxBuildArgs := \
 # property for bootimg #
 ##############################
 
+kBootimgTarget := boot.bin
+kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
+
 kBootimgBuildScriptDir := ${kSrcDirOs}/bootimg
 kBootimgBuildArgs := \
-	BUILD_DIR=${kBuildOsBootimg} \
+	BOOTIMG_TARGET=${kBootimgTargetPath} \
+	BUILD_DIR=${kBuildDirOsBootimg} \
 	OUTPUT_DIR=${kOutDirOsBootimg} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
-	ARCH=${ARCH} \
+	FSBL_SRCS_PATH=${kFSBLTargetPath} \
+	XSA_SRCS_PATH=${kHwTargetPath} \
+	UBOOT_SRCS_PATH=${kUbootTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 
@@ -200,7 +205,8 @@ necessary_exec_prog := \
 	${CROSS_COMPILE}gcc \
 	${XSCT_CLI} \
 	git \
-	bash
+	bash \
+	unzip 
 
 chk_env := $(foreach exec,$(necessary_exec_prog),\
 	$(if $(shell which $(exec)),"Found $(exec); ",$(error "No $(exec) in PATH")))
@@ -231,7 +237,8 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 	build_kernel \
 	build_uboot \
 	build_busybox \
-	make_bootimg
+	build_bootimg 
+	
 
 ################################################################################
 #########
@@ -264,7 +271,7 @@ build_uboot:
 build_busybox: 
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
 
-build_bootimg: build_fsbl build_dt build_kernel build_uboot 
+build_bootimg: build_fsbl build_uboot build_hw
 	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} 
 
 ################################################################################
@@ -298,4 +305,5 @@ distclean: \
 	clean_fsbl \
 	clean_kernel \
 	clean_uboot \
-	clean_busybox
+	clean_busybox \
+	clean_bootimg

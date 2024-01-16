@@ -1,7 +1,0 @@
-//arch = zynq; split = false; format = BIN
-the_ROM_image:
-{
-    [bootloader]/path/to/fsbl-build/fsbl.elf
-    /path/to/linux_bd/linux_bd.sdk/linux_bd_wrapper.bit
-    /path/to/u-boot/u-boot.elf
-}

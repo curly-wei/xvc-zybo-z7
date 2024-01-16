@@ -19,7 +19,7 @@ kUbootSrcLocalDirName := uboot_src
 kUbootSrcLocalPath := ${kBuildDir}/${kUbootSrcLocalDirName}
 
 kUbootConfName := xilinx_zynq_virt_defconfig
-kUbootConfDT :=
+#kUbootConfDT :=
 
 kTarget := $(basename $(notdir ${UBOOT_TARGET}))
 kTargetExec := $(notdir ${UBOOT_TARGET})
@@ -51,14 +51,14 @@ kBuildArgs := \
 	all \
 	clone_remote_uboot_src \
 	clean 
+#.NOTPARALLEL:
 
-.NOTPARALLEL:
 
 all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} clone_remote_uboot_src 
 	$(call InfoPrint,"Start to build uboot")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kUbootSrcLocalPath} ${kUbootConfName}
+	${MAKE} -C ${kUbootSrcLocalPath} ${kBuildArgs} ${kUbootConfName}
 	${MAKE} -C ${kUbootSrcLocalPath} ${kBuildArgs}
 	cp ${kUbootGenFilePath} ${kTargetExecPath}
 	$(call InfoPrint,"Build xvc_os_uboot has been completed")

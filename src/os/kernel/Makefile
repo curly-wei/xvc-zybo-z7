@@ -12,8 +12,8 @@ kOutputDir := ${OUTPUT_DIR}
 ## Please cheack here ##
 ########################
 
-#kKernelSrcRemoteRepoUrl := https://github.com/Xilinx/linux-xlnx.git 
-kKernelSrcRemoteRepoUrl := https://gitlab.com/linux-kernel/linux
+kKernelSrcRemoteRepoUrl := https://github.com/Xilinx/linux-xlnx.git 
+#kKernelSrcRemoteRepoUrl := https://gitlab.com/linux-kernel/linux
 kKernelSrcRemoteBranchTag := master
 kKernelSrcLocalDirName := kernel_src
 kKernelSrcLocalPath := ${kBuildDir}/${kKernelSrcLocalDirName}
@@ -58,7 +58,8 @@ kMakeUImageArgs := \
 	clone_remote_kernel_src \
 	clean 
 
-.NOTPARALLEL:
+#.NOTPARALLEL:
+
 
 all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} clone_remote_kernel_src 

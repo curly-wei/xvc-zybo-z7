@@ -68,9 +68,8 @@ kXsctCLIArgs := \
 	build_dt \
 	gen_base_dt \
 	clone_remote_dt_src \
-	clean 
-
-.NOTPARALLEL:
+	clean
+#.NOTPARALLEL:
 
 #all: gen_base_dt
 

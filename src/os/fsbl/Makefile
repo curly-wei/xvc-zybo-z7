@@ -52,7 +52,7 @@ kXsctCLIArgs := \
 	all \
 	clean \
 
-.NOTPARALLEL:
+#.NOTPARALLEL:
 
 all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps}

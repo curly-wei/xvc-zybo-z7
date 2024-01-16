@@ -70,12 +70,13 @@ kMakeUImageArgs := \
 ################################################################################
 # Run area below #
 ################################################################################
-.NOTPARALLEL: 
 
 .PHONY: \
 	all \
 	clone_remot_busybox_src \
 	clean 
+#.NOTPARALLEL:
+
 
 all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")

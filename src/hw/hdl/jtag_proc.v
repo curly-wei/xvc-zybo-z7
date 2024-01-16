@@ -121,35 +121,35 @@ end
 assign tck_pulse = (tck_cnt == (C_TCK_CLOCK_RATIO/2)-1) ? 1'b1 : 1'b0;
 
 always @(posedge clk_i) begin
-   if (reset_i == 1'b1) begin
-   tck_r       <= 1'b0;
-   tms_r  <= 0;
-   tdi_r  <= 0;
-   tdo_capture <= 0;
-   done_o        <= 1'b0;
-   end else begin
-   done_o <= done_r;
-   if (en_edge == 1'b1) begin
-   tck_r       <= 1'b0;
-   tms_r  <= tms_vec_i;
-   tdi_r  <= tdi_vec_i;
-   tdo_capture <= 0;
-   end else if (tck_en == 1'b1) begin
-   if (tck_pulse == 1'b1) begin
-    tck_r <= ~tck_r;
-    if (state == TCKH_lk) begin
-    tms_r  <= {1'b0, tms_r[31:1]};
-    tdi_r  <= {1'b0, tdi_r[31:1]};
-    tdo_capture <= {tdo_capture[30:0], tdo_i};
-    end else begin
-    tdo_buffer[index] <= tdo_i;
+  if (reset_i == 1'b1) begin
+    tck_r  <= 1'b0;
+    tms_r  <= 0;
+    tdi_r  <= 0;
+    tdo_capture <= 0;
+    done_o <= 1'b0;
+  end else begin
+    done_o <= done_r;
+    if (en_edge == 1'b1) begin
+      tck_r       <= 1'b0;
+      tms_r  <= tms_vec_i;
+      tdi_r  <= tdi_vec_i;
+      tdo_capture <= 0;
+    end else if (tck_en == 1'b1) begin
+      if (tck_pulse == 1'b1) begin
+        tck_r <= ~tck_r;
+        if (state == TCKH_lk) begin
+          tms_r  <= {1'b0, tms_r[31:1]};
+          tdi_r  <= {1'b0, tdi_r[31:1]};
+          tdo_capture <= {tdo_capture[30:0], tdo_i};
+        end else begin
+          tdo_buffer[index] <= tdo_i;
+        end
     end
-   end
-   end else begin
-   tms_r <= 0;
-   tdi_r <= 0;
-   end
-   end
+    end else begin
+      tms_r <= 0;
+      tdi_r <= 0;
+    end
+  end
 end
 
 genvar i;
