@@ -33,6 +33,7 @@ kOutDirOsKernel := ${kOutDir}/kernel
 kOutDirOsUboot := ${kOutDir}/uboot
 kOutDirOsBusybox := ${kOutDir}/busybox
 kOutDirOsBootimg  := ${kOutDir}/bootimg
+kOutDirOsRootFS  := ${kOutDir}/rootfs
 
 # Build Dirs
 kBuildDirHw := ${kBuildDir}/build_hw
@@ -44,6 +45,7 @@ kBuildDirOsKernel := ${kBuildDir}/build_kernel
 kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
 kBuildDirOsBootimg := ${kBuildDir}/bootimg
+kBuildDirOsRootFS := ${kBuildDir}/rootfs
 
 #########################
 # property for Compiler #
@@ -164,7 +166,7 @@ kUbootlBuildArgs := \
 	ARCH=${ARCH} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
-##############################
+###############################
 # property for build Busybox #
 ##############################
 
@@ -177,9 +179,9 @@ kBusyboxBuildArgs := \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 
-##############################
+#########################
 # property for bootimg #
-##############################
+########################
 
 kBootimgTarget := boot.bin
 kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
@@ -195,6 +197,23 @@ kBootimgBuildArgs := \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 
+#######################
+# property for rootfs #
+#######################
+
+kRoootFSTarget := rootfs.img
+kRootFSTargetPath := ${kOutDirOsRootFS}/${kRoootFSTarget}
+
+kRootFSBuildScriptDir := ${kSrcDirOs}/rootfs
+kRootFSBuildArgs := \
+	ROOTFS_TARGET=${kRootFSTargetPath} \
+	BUILD_DIR=${kBuildDirOsRootFS} \
+	OUTPUT_DIR=${kOutDirOsRootFS} \
+	BUSYBOX_SRCS_PATH=${kHwTargetPath} \
+	DTB_SRCS_PATH=${kFSBLTargetPath} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
 ################################################################################
 ###################
 # Check build env #
@@ -206,7 +225,9 @@ necessary_exec_prog := \
 	${XSCT_CLI} \
 	git \
 	bash \
-	unzip 
+	unzip \
+	mkimage \
+	dtc
 
 chk_env := $(foreach exec,$(necessary_exec_prog),\
 	$(if $(shell which $(exec)),"Found $(exec); ",$(error "No $(exec) in PATH")))
@@ -237,7 +258,8 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 	build_kernel \
 	build_uboot \
 	build_busybox \
-	build_bootimg 
+	build_bootimg \
+	make_rootfs
 	
 
 ################################################################################
@@ -248,22 +270,14 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 
 all: make_rootfs
 
-make_rootfs: build_bootimg build_busybox
+make_rootfs: build_bootimg build_busybox build_dt build_kernel build_sw
+	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} 
 
-build_hw: 
-	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
-
-build_sw: 
-	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
-
-build_dt: build_hw
-	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
+build_bootimg: build_fsbl build_uboot
+	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} 
 
 build_fsbl: build_hw
 	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs}
-
-build_kernel:
-	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs}
 
 build_uboot:
 	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs}
@@ -271,32 +285,42 @@ build_uboot:
 build_busybox: 
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
 
-build_bootimg: build_fsbl build_uboot build_hw
-	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} 
+build_dt: build_hw
+	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
+
+build_kernel:
+	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs}
+
+build_hw: 
+	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
+
+build_sw: 
+	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
+
 
 ################################################################################
 #########
 # Clean #
 #########
 ################################################################################
-
-clean_hw:
-	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
-clean_sw:
-	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
-clean_dt:
-	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+clean_rootfs:
+	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} clean
+clean_bootimg:
+	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} clean
 clean_fsbl:
 	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs} clean
-clean_kernel:
-	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
 clean_uboot:
 	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs} clean
 clean_busybox:
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs} clean
-clean_bootimg:
-	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} clean
-clean_rootfs:
+clean_dt:
+	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+clean_kernel:
+	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
+clean_hw:
+	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
+clean_sw:
+	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
 
 distclean: \
 	clean_hw \
@@ -306,4 +330,5 @@ distclean: \
 	clean_kernel \
 	clean_uboot \
 	clean_busybox \
-	clean_bootimg
+	clean_bootimg \
+	clean_rootfs

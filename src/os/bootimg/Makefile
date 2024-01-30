@@ -34,10 +34,10 @@ kFSBLTargetName := $(notdir ${kFSBLSrcsPath})
 kUFSBLTargetPath := ${kBuildDir}/${kFSBLTargetName}
 
 kBootbifBegin := $(basename $(notdir ${kBootbifName}))":{"
-kBootbifEnd := "}"
 kBootbifLoader := "[bootloader]${kUFSBLTargetPath}"
 kBootbifFPGABit := ${kFPGABitTargetPath}
 kBootbifUboot := ${kUbootTargetPath}
+kBootbifEnd := "}"
 
 
 ################################################################################
@@ -63,14 +63,16 @@ kDeps := \
 
 
 all: gen_bootimg
-
 gen_bootimg: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} gen_bootbif
+	$(call InfoPrint,"Start to build bootimg")
 	bootgen -image ${kBootbifPath} -w -o ${kTargetExecPath}
+	$(call InfoPrint,"Build xvc_os_bootimg has been completed")
 
 
 gen_bootbif: ${kBootbifPath}
 ${kBootbifPath}: ${kDeps} extract_FPGAbit_from_xsa prepare_uboot prepare_fsbl
+	$(call InfoPrint,"Generate boot.bif")
 	@echo "" > ${kBootbifPath}
 	@echo ${kBootbifBegin} >> ${kBootbifPath} 
 	@echo ${kBootbifLoader} >> ${kBootbifPath} 
@@ -81,15 +83,18 @@ ${kBootbifPath}: ${kDeps} extract_FPGAbit_from_xsa prepare_uboot prepare_fsbl
 
 extract_FPGAbit_from_xsa: ${kFPGABitTargetPath}
 ${kFPGABitTargetPath}: ${kDeps} ${kXSASrcsPath}
+	$(call InfoPrint,"Extract FPGA.bit file from .xsa file")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	unzip -p ${kXSASrcsPath} ${kFPGABitTargetName} > ${kFPGABitTargetPath}
 
 prepare_uboot: ${kUbootTargetPath}
 ${kUbootTargetPath}: ${kDeps} ${kUbootSrcsPath}
+	$(call InfoPrint,"Take uboot image")
 	cp ${kUbootSrcsPath} ${kUbootTargetPath}
 
 prepare_fsbl: ${kUFSBLTargetPath}
 ${kUFSBLTargetPath}: ${kDeps} ${kFSBLSrcsPath}
+	$(call InfoPrint,"Take FSBL image")
 	cp ${kFSBLSrcsPath} ${kUFSBLTargetPath}
 
 clean:

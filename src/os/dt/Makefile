@@ -71,10 +71,10 @@ kXsctCLIArgs := \
 	clean
 #.NOTPARALLEL:
 
-#all: gen_base_dt
+all: gen_base_dt
 
-#build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
-#	${kTargetExecPath}: 
+build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
+	${kTargetExecPath}: 
 
 
 gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src 

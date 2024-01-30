@@ -89,6 +89,7 @@ all: clone_remot_busybox_src ${kDeps}
 	done	
 	cp -r ${kBusyboxGenFsDirPath}/* ${kOutputDir}
 	cp ${kFSTabPath} ${kFSTabOutDest}
+	$(call InfoPrint,"Build xvc_os_busybox has been completed")
 
 clone_remot_busybox_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
