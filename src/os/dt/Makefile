@@ -27,6 +27,16 @@ kXilDTSrcLocalDirName := device-tree-xlnx
 kXilDTSrcRemoteBranchTag := master
 kXilDTSrcLocalPath := ${kBuildDir}/${kXilDTSrcLocalDirName}
 
+kDigilentDTSrcRepoURL := https://github.com/Xilinx/device-tree-xlnx.git
+kDigilentDTSrcLocalDirName := device-tree-digilent
+kDigilentDTSrcRemoteBranchTag := master
+kDigilentDTSrcLocalPath := ${kBuildDir}/${kDigilentDTSrcLocalDirName}
+
+# Param for pl.dtsi
+kPlDtsiPath = ${kBaseDTOutputDir}/pl.dtsi
+kPlDtboPath = ${kBaseDTOutputDir}/pl.dtbo 
+
+
 # Param for dt
 kTarget := $(basename $(notdir ${DT_TARGET}))
 kTargetExec := $(notdir ${DT_TARGET})
@@ -67,7 +77,7 @@ kXsctCLIArgs := \
 	all \
 	build_dt \
 	gen_base_dt \
-	clone_remote_dt_src \
+	clone_remote_dt_src_xilinx \
 	clean
 #.NOTPARALLEL:
 
@@ -77,14 +87,17 @@ build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
 	${kTargetExecPath}: 
 
 
-gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src 
+gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx clone_remote_dt_src_digilent
 	$(call InfoPrint,"Start to build dt")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${kXsctCLI} ${kBuildTCLScript} ${kXsctCLIArgs}
-	$(call InfoPrint,"Build dt has completed")
+	$(call InfoPrint,"Build base dt has been completed")
+	dtc -@ -O dtb -o ${kPlDtboPath} ${kPlDtsiPath}
+	$(call InfoPrint,"Build pl.dtbo from base dt has been completed")
 
-clone_remote_dt_src:
-	$(call InfoPrint,"Check Remote/Local Repository...")
+
+clone_remote_dt_src_xilinx:
+	$(call InfoPrint,"Check Remote/Local Xilinx Repository...")
 	@if [ ! -d ${kXilDTSrcLocalPath} ]; then \
 		echo "Remote repository doesn't exist in local, cloning...";\
 		git clone \
@@ -96,6 +109,21 @@ clone_remote_dt_src:
 		cd ${kXilDTSrcLocalPath}; \
 		git pull ${kXilDTSrcRepoURL}; \
 	fi	
+
+clone_remote_dt_src_digilent:
+	$(call InfoPrint,"Check Remote/Local Digilent Repository...")
+	@if [ ! -d ${kDigilentDTSrcLocalPath} ]; then \
+		echo "Remote repository doesn't exist in local, cloning...";\
+		git clone \
+		--depth=1 \
+		--branch=${kDigilentDTSrcRemoteBranchTag} \
+		${kDigilentDTSrcRepoURL} ${kDigilentDTSrcLocalPath}; \
+	else \
+		echo "Remote repository exist in local, check newest..."; \
+		cd ${kDigilentDTSrcLocalPath}; \
+		git pull ${kDigilentDTSrcRepoURL}; \
+	fi	
+
 
 clean:
 	$(call InfoPrint,"Clean xvc_os_dt build/out directories")

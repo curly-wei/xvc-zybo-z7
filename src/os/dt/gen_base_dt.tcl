@@ -41,14 +41,21 @@ puts [InfoStr "set DT repositary from xilinx-git"]
 hsi::set_repo_path ${kXilDTSrcLocalPath}
 
 puts [InfoStr "read xsa file"]
-hsi::open_hw_design ${kXSAFilePath}
+hsi::open_hw_design -verbose ${kXSAFilePath}
 
 puts [InfoStr "create DT project from xsa file"]
 hsi::create_sw_design device-tree -os device_tree -proc ps7_cortexa9_0
 
+puts [InfoStr "new"]
+common::set_property CONFIG.dt_overlay true [hsi::get_os]
+
+puts [InfoStr "new"]
+common::set_property CONFIG.dt_zocl true [hsi::get_os]    
+
 puts [InfoStr "Generate DT"]
 hsi::generate_target -dir ${kOutputDir}
 
+
 puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Generate Device Tree completed"]
+puts [InfoStr "Generate Device Tree has been completed"]
 puts [InfoStr "-----------------------------------------------"]

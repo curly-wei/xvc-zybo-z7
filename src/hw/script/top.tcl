@@ -183,7 +183,7 @@ write_hw_platform -fixed -include_bit -force -verbose \
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}.xsa"
 
 puts [InfoStr "---------------------------------------------"]
-puts [InfoStr "Run Vivado to build XVC HW has completed"]
+puts [InfoStr "Run Vivado to build XVC HW has been completed"]
 puts [InfoStr "---------------------------------------------"]
 
 

@@ -33,6 +33,7 @@ kOutDirOsKernel := ${kOutDir}/kernel
 kOutDirOsUboot := ${kOutDir}/uboot
 kOutDirOsBusybox := ${kOutDir}/busybox
 kOutDirOsBootimg  := ${kOutDir}/bootimg
+kOutDirOsDropbear := ${kOutDir}/dropbear
 kOutDirOsRootFS  := ${kOutDir}/rootfs
 
 # Build Dirs
@@ -45,6 +46,7 @@ kBuildDirOsKernel := ${kBuildDir}/build_kernel
 kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
 kBuildDirOsBootimg := ${kBuildDir}/bootimg
+kBuildDirOsDropbear := ${kBuildDir}/dropbear
 kBuildDirOsRootFS := ${kBuildDir}/rootfs
 
 #########################
@@ -75,7 +77,6 @@ kUtilitiesTopPath := ${kSrcDir}/utilities
 #########################
 # property for build hw #
 #########################
-
 kHwTarget := xvc_server_hw.xsa
 kHwTargetPath := ${kOutDirHw}/${kHwTarget}
 
@@ -90,7 +91,6 @@ kHwBuildArgs := \
 #########################
 # property for build sw #
 #########################
-
 kSwTarget := xvc_server.elf
 kSwTargetPath := ${kOutDirSw}/${kSwTarget}
 
@@ -105,7 +105,6 @@ kSwBuildArgs := \
 #########################
 # property for build dt #
 #########################
-
 kDTTarget := devicetree.dtb
 kDTTargetPath := ${kOutDirOsDT}/${kDTTarget}
 
@@ -121,7 +120,6 @@ kDTBuildArgs := \
 ###########################
 # property for build fsbl #
 ###########################
-
 kFSBLTarget := fsbl.elf
 kFSBLTargetPath := ${kOutDirOsFSBL}/${kFSBLTarget}
 
@@ -137,7 +135,6 @@ kFSBLBuildArgs := \
 #############################
 # property for build kernel #
 #############################
-
 kKernelTarget := uImage.bin
 kKernelTargetPath := ${kOutDirOsKernel}/${kKernelTarget}
 
@@ -153,7 +150,6 @@ kKernelBuildArgs := \
 #############################
 # property for build Uboot #
 #############################
-
 kUbootTarget := u-boot.elf
 kUbootTargetPath := ${kOutDirOsUboot}/${kUbootTarget}
 
@@ -169,7 +165,6 @@ kUbootlBuildArgs := \
 ###############################
 # property for build Busybox #
 ##############################
-
 kBusyboxBuildScriptDir := ${kSrcDirOs}/busybox
 kBusyboxBuildArgs := \
 	BUILD_DIR=${kBuildDirOsBusybox} \
@@ -178,11 +173,9 @@ kBusyboxBuildArgs := \
 	ARCH=${ARCH} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
-
 #########################
 # property for bootimg #
 ########################
-
 kBootimgTarget := boot.bin
 kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
 
@@ -196,11 +189,23 @@ kBootimgBuildArgs := \
 	UBOOT_SRCS_PATH=${kUbootTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
+###############################
+# property for build Dropbear #
+##############################
+kDropbearTarget := dropbear
+kDropbearTargetPath := ${kOutDirOsDropbear}/${kDropbearTarget}
+
+kDropbearBuildScriptDir := ${kSrcDirOs}/dropbear
+kDropbearBuildArgs := \
+	BUILD_DIR=${kBuildDirOsDropbear} \
+	OUTPUT_DIR=${kOutDirOsDropbear} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 #######################
 # property for rootfs #
 #######################
-
 kRoootFSTarget := rootfs.img
 kRootFSTargetPath := ${kOutDirOsRootFS}/${kRoootFSTarget}
 
@@ -259,6 +264,7 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 	build_uboot \
 	build_busybox \
 	build_bootimg \
+	build_dropbear \
 	make_rootfs
 	
 
@@ -270,7 +276,8 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 
 all: make_rootfs
 
-make_rootfs: build_bootimg build_busybox build_dt build_kernel build_sw
+make_rootfs: build_bootimg build_busybox build_dt build_kernel \
+		build_sw build_dropbear
 	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} 
 
 build_bootimg: build_fsbl build_uboot
@@ -284,6 +291,9 @@ build_uboot:
 
 build_busybox: 
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
+
+build_dropbear:
+	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
 
 build_dt: build_hw
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
@@ -313,6 +323,8 @@ clean_uboot:
 	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs} clean
 clean_busybox:
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs} clean
+clean_dropbear:
+	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs} clean
 clean_dt:
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
 clean_kernel:

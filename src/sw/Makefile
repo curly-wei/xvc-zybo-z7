@@ -70,7 +70,7 @@ start_msg:
 	$(call InfoPrint,"Start to check/build xvc_sw")
 
 end_msg:
-	$(call InfoPrint,"Check/build xvc_sw has completed")
+	$(call InfoPrint,"Check/build xvc_sw has been completed")
 
 init_dir: 
 	$(call InfoPrint,"Create OutDir and BuildDir for xvc_sw")

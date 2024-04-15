@@ -96,6 +96,6 @@ app build -name ${kAPPName}
 
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
-puts [InfoStr "-----------------------------------------------"]
-puts [InfoStr "Run Vitist-XCST to build FSBL has completed"]
-puts [InfoStr "-----------------------------------------------"]
+puts [InfoStr "------------------------------------------------"]
+puts [InfoStr "Run Vitist-XCST to build FSBL has been completed"]
+puts [InfoStr "------------------------------------------------"]

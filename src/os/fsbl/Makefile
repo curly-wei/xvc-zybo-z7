@@ -60,7 +60,7 @@ ${kTargetExecPath}: ${kDeps}
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${kXsctCLI} ${kBuildTCLScriptPath} ${kXsctCLIArgs}
 	cp ${kFSBLGenPath} ${kTargetExecPath}
-	$(call InfoPrint,"Build fsbl has completed")
+	$(call InfoPrint,"Build fsbl has been completed")
 
 clean:
 	$(call InfoPrint,"Clean xvc_os_fsbl build/out directories")
