@@ -19,13 +19,12 @@ kBuildDir := ${BUILD_DIR}
 # Srcs Dirs
 kSrcDir := ${kProjRootDir}/src
 kSrcDirHw := ${kProjRootDir}/src/hw
-kSrcDirSw := ${kProjRootDir}/src/sw
 kSrcDirOs := ${kProjRootDir}/src/os
+kSrcDirSw := ${kProjRootDir}/src/sw
 
 # Output Dirs
 kOutDir := ${kBuildDir}/out
 kOutDirHw := ${kOutDir}/hw
-kOutDirSw := ${kOutDir}/sw
 
 kOutDirOsDT := ${kOutDir}/dt
 kOutDirOsFSBL := ${kOutDir}/fsbl
@@ -33,12 +32,14 @@ kOutDirOsKernel := ${kOutDir}/kernel
 kOutDirOsUboot := ${kOutDir}/uboot
 kOutDirOsBusybox := ${kOutDir}/busybox
 kOutDirOsBootimg  := ${kOutDir}/bootimg
-kOutDirOsDropbear := ${kOutDir}/dropbear
 kOutDirOsRootFS  := ${kOutDir}/rootfs
+
+kOutDirSwDropbear := ${kOutDir}/dropbear
+kOutDirSwZlib := ${kOutDir}/zlib
+kOutDirSwXVCServer := ${kOutDir}/xvc_server
 
 # Build Dirs
 kBuildDirHw := ${kBuildDir}/build_hw
-kBuildDirSw := ${kBuildDir}/build_sw
 
 kBuildDirOsDT := ${kBuildDir}/build_dt
 kBuildDirOsFSBL := ${kBuildDir}/build_fsbl
@@ -46,9 +47,11 @@ kBuildDirOsKernel := ${kBuildDir}/build_kernel
 kBuildDirOsUboot := ${kBuildDir}/build_uboot
 kBuildDirOsBusybox := ${kBuildDir}/build_busybox
 kBuildDirOsBootimg := ${kBuildDir}/bootimg
-kBuildDirOsDropbear := ${kBuildDir}/dropbear
 kBuildDirOsRootFS := ${kBuildDir}/rootfs
 
+kBuildDirSwDropbear := ${kBuildDir}/build_dropbear
+kBuildDirSwZlib := ${kBuildDir}/build_zlib
+kBuildDirSwXVCServer := ${kBuildDir}/build_xvc_server
 #########################
 # property for Compiler #
 #########################
@@ -86,20 +89,6 @@ kHwBuildArgs := \
 	BUILD_DIR=${kBuildDirHw} \
 	OUTPUT_DIR=${kOutDirHw} \
 	VIVADO_CLI=${VIVADO_CLI} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
-
-#########################
-# property for build sw #
-#########################
-kSwTarget := xvc_server.elf
-kSwTargetPath := ${kOutDirSw}/${kSwTarget}
-
-kSwBuildScriptDir := ${kSrcDirSw}
-kSwBuildArgs := \
-	SW_TARGET=${kSwTargetPath} \
-	BUILD_DIR=${kBuildDirSw} \
-	OUTPUT_DIR=${kOutDirSw} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 #########################
@@ -189,20 +178,6 @@ kBootimgBuildArgs := \
 	UBOOT_SRCS_PATH=${kUbootTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
-###############################
-# property for build Dropbear #
-##############################
-kDropbearTarget := dropbear
-kDropbearTargetPath := ${kOutDirOsDropbear}/${kDropbearTarget}
-
-kDropbearBuildScriptDir := ${kSrcDirOs}/dropbear
-kDropbearBuildArgs := \
-	BUILD_DIR=${kBuildDirOsDropbear} \
-	OUTPUT_DIR=${kOutDirOsDropbear} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
-	ARCH=${ARCH} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
-
 #######################
 # property for rootfs #
 #######################
@@ -217,6 +192,53 @@ kRootFSBuildArgs := \
 	BUSYBOX_SRCS_PATH=${kHwTargetPath} \
 	DTB_SRCS_PATH=${kFSBLTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+###############################
+# property for build zlib #
+##############################
+kZlibTarget := libz.a
+kZlibTargetPath := ${kOutDirSwZlib}/${kZlibTarget}
+
+kDropbearBuildScriptDir := ${kSrcDirSw}/zlib
+kZlibBuildArgs := \
+	SW_TARGET=${kZlibTarget} \
+	BUILD_DIR=${kBuildDirSwZlib} \
+	OUTPUT_DIR=${kOutDirSwZlib} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+###############################
+# property for build Dropbear #
+##############################
+kDropbearTarget := dropbear
+kDropbearTargetPath := ${kOutDirSwDropbear}/${kDropbearTarget}
+
+kDropbearBuildScriptDir := ${kSrcDirSw}/dropbear
+kDropbearBuildArgs := \
+	SW_TARGET=${kDropbearTarget} \
+	BUILD_DIR=${kBuildDirSwDropbear} \
+	OUTPUT_DIR=${kOutDirSwDropbear} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	ARCH=${ARCH} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+#########################
+# property for build sw #
+#########################
+kSwTarget := xvc_server.elf
+kSwTargetPath := ${kOutDirSwXVCServer}/${kSwTarget}
+
+kSwBuildScriptDir := ${kSrcDirSw}/xvc_server
+kSwBuildArgs := \
+	SW_TARGET=${kSwTargetPath} \
+	BUILD_DIR=${kBuildDirSwXVCServer} \
+	OUTPUT_DIR=${kOutDirSwXVCServer} \
+	CROSS_COMPILE=${CROSS_COMPILE} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 
 ################################################################################
@@ -245,28 +267,29 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 ################################################################################
 
 .PHONY: \
-	clean_hw \
-	clean_sw \
-	clean_dt \
+	clean_rootfs \
+	clean_bootimg \
 	clean_fsbl \
-	clean_kernel \
 	clean_uboot \
 	clean_busybox\
-	clean_bootimg \
-	clean_rootfs \
+	clean_dt \
+	clean_kernel \
+	clean_hw \
+	clean_zlib \
+	clean_dropbear \
+	clean_sw \
 	distclean \
 	all \
-	build_hw \
-	build_sw \
-	build_dt \
+	make_rootfs \
+	build_bootimg \
 	build_fsbl \
-	build_kernel \
 	build_uboot \
 	build_busybox \
-	build_bootimg \
+	build_kernel \
+	build_hw \
+	build_dt \
 	build_dropbear \
-	make_rootfs
-	
+	build_sw 
 
 ################################################################################
 #########
@@ -292,9 +315,6 @@ build_uboot:
 build_busybox: 
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
 
-build_dropbear:
-	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
-
 build_dt: build_hw
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
 
@@ -303,6 +323,12 @@ build_kernel:
 
 build_hw: 
 	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
+
+build_zlib:
+	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs}
+
+build_dropbear: build_zlib
+	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
 
 build_sw: 
 	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs}
@@ -323,24 +349,28 @@ clean_uboot:
 	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs} clean
 clean_busybox:
 	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs} clean
-clean_dropbear:
-	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs} clean
 clean_dt:
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
 clean_kernel:
 	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
 clean_hw:
 	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
+clean_zlib:
+	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs} clean
+clean_dropbear:
+	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs} clean
 clean_sw:
 	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
 
 distclean: \
-	clean_hw \
-	clean_sw \
-	clean_dt \
+	clean_rootfs \
+	clean_bootimg \
 	clean_fsbl \
-	clean_kernel \
 	clean_uboot \
 	clean_busybox \
-	clean_bootimg \
-	clean_rootfs
+	clean_dt \
+	clean_kernel \
+	clean_hw \
+	clean_zlib \
+	clean_dropbear \
+	clean_sw 

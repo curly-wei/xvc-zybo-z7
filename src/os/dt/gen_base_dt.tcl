@@ -46,10 +46,10 @@ hsi::open_hw_design -verbose ${kXSAFilePath}
 puts [InfoStr "create DT project from xsa file"]
 hsi::create_sw_design device-tree -os device_tree -proc ps7_cortexa9_0
 
-puts [InfoStr "new"]
+puts [InfoStr "Set DT-Overlay ON"]
 common::set_property CONFIG.dt_overlay true [hsi::get_os]
 
-puts [InfoStr "new"]
+puts [InfoStr "Set DT-ZOCL ON"]
 common::set_property CONFIG.dt_zocl true [hsi::get_os]    
 
 puts [InfoStr "Generate DT"]

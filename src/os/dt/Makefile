@@ -27,10 +27,12 @@ kXilDTSrcLocalDirName := device-tree-xlnx
 kXilDTSrcRemoteBranchTag := master
 kXilDTSrcLocalPath := ${kBuildDir}/${kXilDTSrcLocalDirName}
 
-kDigilentDTSrcRepoURL := https://github.com/Xilinx/device-tree-xlnx.git
-kDigilentDTSrcLocalDirName := device-tree-digilent
-kDigilentDTSrcRemoteBranchTag := master
-kDigilentDTSrcLocalPath := ${kBuildDir}/${kDigilentDTSrcLocalDirName}
+kDigilentDTSrcRepoURL := \
+https://raw.githubusercontent.com/Digilent/linux-Digilent-Dev/master/arch/arm/boot/dts/zynq-zybo.dts
+kDigilentDTSrcLocalDirName := device-tree-digilent-zybo-z7
+kDigilentDTSrcLocalFileName := zynq-zybo.dts
+kDigilentDTSrcLocalPath := \
+${kBuildDir}/${kDigilentDTSrcLocalDirName}/${kDigilentDTSrcLocalFileName}
 
 # Param for pl.dtsi
 kPlDtsiPath = ${kBaseDTOutputDir}/pl.dtsi
@@ -111,18 +113,9 @@ clone_remote_dt_src_xilinx:
 	fi	
 
 clone_remote_dt_src_digilent:
-	$(call InfoPrint,"Check Remote/Local Digilent Repository...")
-	@if [ ! -d ${kDigilentDTSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kDigilentDTSrcRemoteBranchTag} \
-		${kDigilentDTSrcRepoURL} ${kDigilentDTSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kDigilentDTSrcLocalPath}; \
-		git pull ${kDigilentDTSrcRepoURL}; \
-	fi	
+	$(call InfoPrint,"Check Remote/Local Digilent DT...")
+	mkdir -p ${kBuildDir}/${kDigilentDTSrcLocalDirName}
+	curl ${kDigilentDTSrcRepoURL} > ${kDigilentDTSrcLocalPath}
 
 
 clean:
