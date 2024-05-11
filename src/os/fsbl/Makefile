@@ -1,11 +1,11 @@
 # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
-kXSASrcsPath := ${XSA_SRCS_PATH}
+kXSASrcPath := ${XSA_SRC_PATH}
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
@@ -30,7 +30,7 @@ kFSBLGenFileName := ${kTargetExec}
 kFSBLGenPath := ${kFSBLGenDir}/${kFSBLGenFileName}
 
 kDeps := \
-	${kXSASrcsPath} \
+	${kXSASrcPath} \
 	${kBuildTCLScriptPath} \
 	${kTCLUtilitiesTopPath}
 
@@ -41,7 +41,7 @@ kXsctCLIArgs := \
 	-O ${kOutputDir} \
 	-t ${kTarget} \
 	-U ${kTCLUtilitiesTopPath} \
-	-x ${kXSASrcsPath} 
+	-x ${kXSASrcPath} 
 
 
 ################################################################################

@@ -19,7 +19,7 @@ kBuildDTSrcsDir := ${kSrcsDir}
 ########################
 
 # Param for base dt
-kXSASrcsPath := ${XSA_SRCS_PATH}
+kXSASrcsPath := ${XSA_SRC_PATH}
 kBuildTCLScript := gen_base_dt.tcl
 
 kXilDTSrcRepoURL := https://github.com/Xilinx/device-tree-xlnx.git

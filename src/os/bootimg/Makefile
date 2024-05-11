@@ -20,11 +20,11 @@ kTargetExecPath := ${kOutputDir}/${kTargetExec}
 kBootbifName := ${kTarget}img.bif
 kBootbifPath := ${kBuildDir}/${kBootbifName}
 
-kXSASrcsPath := ${XSA_SRCS_PATH}
+kXSASrcPath := ${XSA_SRC_PATH}
 kUbootSrcsPath := ${UBOOT_SRCS_PATH}
 kFSBLSrcsPath := ${FSBL_SRCS_PATH}
 
-kFPGABitTargetName := $(basename $(notdir ${kXSASrcsPath})).bit
+kFPGABitTargetName := ${basename ${notdir ${kXSASrcPath}}}.bit
 kFPGABitTargetPath := ${kBuildDir}/${kFPGABitTargetName}
 
 kUbootTargetName := $(notdir ${kUbootSrcsPath})
@@ -82,10 +82,10 @@ ${kBootbifPath}: ${kDeps} extract_FPGAbit_from_xsa prepare_uboot prepare_fsbl
 	
 
 extract_FPGAbit_from_xsa: ${kFPGABitTargetPath}
-${kFPGABitTargetPath}: ${kDeps} ${kXSASrcsPath}
+${kFPGABitTargetPath}: ${kDeps} ${kXSASrcPath}
 	$(call InfoPrint,"Extract FPGA.bit file from .xsa file")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	unzip -p ${kXSASrcsPath} ${kFPGABitTargetName} > ${kFPGABitTargetPath}
+	unzip -j ${kXSASrcPath} ${kFPGABitTargetName} -d ${kBuildDir}
 
 prepare_uboot: ${kUbootTargetPath}
 ${kUbootTargetPath}: ${kDeps} ${kUbootSrcsPath}

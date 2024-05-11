@@ -94,6 +94,7 @@ app config \
 puts [InfoStr "build app"]
 app build -name ${kAPPName} 
 
+
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
 
 puts [InfoStr "------------------------------------------------"]

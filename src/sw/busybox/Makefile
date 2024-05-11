@@ -28,9 +28,6 @@ kBusyboxSrcLocalPath := ${kBuildDir}/${kBusyboxSrcLocalDirName}
 
 kBusyboxConfName := defconfig
 
-kBusyboxGenFsDirName := _install
-kBusyboxGenFsDirPath := ${kBusyboxSrcLocalPath}/${kBusyboxGenFsDirName}
-
 kRootFolders := \
 	/etc/rc.d \
   /var/log \
@@ -44,6 +41,8 @@ kRootFolders := \
   /home \
   /dev \
   /lib
+
+kPatchingCMD := 
 
 ################################################################################
 
@@ -62,10 +61,6 @@ kBuildArgs := \
 	ARCH=${kARCH} \
 	INSTALL_PATH=${kOutputDir}
 
-kMakeUImageArgs := \
-	UIMAGE_LOADADDR=${kUImgLoadAddr} \
-	${kUImageGenFileName}
-
 
 ################################################################################
 # Run area below #
@@ -81,13 +76,12 @@ kMakeUImageArgs := \
 all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBusyboxConfName} ${kBuildArgs}
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName} 
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} install
 	@for i in ${kRootFolders}; do \
-	 	mkdir -p ${kBusyboxGenFsDirPath}/$${i}; \
+	 	mkdir -p ${kOutputDir}/$${i}; \
 	done	
-	cp -r ${kBusyboxGenFsDirPath}/* ${kOutputDir}
 	cp ${kFSTabPath} ${kFSTabOutDest}
 	$(call InfoPrint,"Build xvc_os_busybox has been completed")
 

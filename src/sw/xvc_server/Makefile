@@ -22,7 +22,7 @@ kCSrcsPath:= \
 kCHeadersPath := \
 	$(foreach i,${kCHeaders},$(addprefix ${kSrcsDir}/,${i}))
 
-kTarget := $(basename $(notdir ${SW_TARGET}))
+kTarget := $(basename $(notdir ${SW_TARGET_XVC_SERVER}))
 
 kTargetExecDebug := ${kOutputDir}/${kTarget}-d.elf
 kTargetExecRelease := ${kOutputDir}/${kTarget}.elf
@@ -54,7 +54,7 @@ ${kTargetExecDebug}: ${kObjDebug}
 	$(call InfoPrint,"Linking...")
 	${kCC} ${kLDFlags} ${kObjDebug} -o ${kTargetExecDebug}
 
-${kTargetExecRelease}: ${kTargetExecRelease}
+${kTargetExecRelease}: ${kObjRelease}
 	$(call InfoPrint,"Linking...")
 	${kCC} ${kLDFlags} ${kObjRelease} -o ${kTargetExecRelease}
 
@@ -64,7 +64,7 @@ ${kObjDebug}: ${kDeps}
 
 ${kObjRelease}: ${kDeps}
 	$(call InfoPrint,"Compiling (release)...")
-	${kCC} ${kCFlags} ${kReleaseFlags} -c ${kCSrcsPath} -o ${kObjDebug}
+	${kCC} ${kCFlags} ${kReleaseFlags} -c ${kCSrcsPath} -o ${kObjRelease}
 
 start_msg:
 	$(call InfoPrint,"Start to check/build xvc_sw")

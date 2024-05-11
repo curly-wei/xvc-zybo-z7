@@ -1,23 +1,50 @@
-# include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+PROJ_ROOT_DIR ?= $(shell realpath `pwd`/../../)
 
+# include utiluty
+UTILITIES_TOP_DIR ?= $(shell realpath ${PROJ_ROOT_DIR}/src/utilities)
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
-# I/O/B dir
-kSrcsDir := $(shell pwd)
-kBuildDir := ${BUILD_DIR}
-kOutputDir := ${OUTPUT_DIR}
 
-kVerilogSrcsDir := ${kSrcsDir}/hdl
-kXDCSrcsDir := ${kSrcsDir}/xdc
-kScriptsDir := ${kSrcsDir}/script
+#########################################################
+      # Necessary properities #
+#########################################################
 
-# Necessary properity
+# I/O/B dir global (full project on parent)
+PROJ_BUILD_DIR ?= ${PROJ_ROOT_DIR}/build
+PROJ_OUTPUT_DIR ?= ${PROJ_BUILD_DIR}/out
+# Compiler ant its features
+XSCT_CLI ?= xsct
+XSA_SRC_PATH ?= ${PROJ_OUTPUT_DIR}/hw/xvc_server_hw.xsa
+CROSS_COMPILE ?= arm-linux-gnueabihf-
+ARCH ?= arm
+#########################################################
 
-xsct = ${XSCT_CLI}
-xsa_srcs_path = ${XSA_SRCS_PATH}
+# I/O/B local (for os)
+kBuildDirOs := ${PROJ_BUILD_DIR}/os
+kOutDirOs := ${PROJ_OUTPUT_DIR}/os
+kSrcDirOs := $(shell pwd)
 
+# Compiler and its env.
+kXSCT := ${XSCT_CLI}
+kXSASrcPath := ${XSA_SRC_PATH}
 
+kCC := ${CROSS_COMPILE}
+kArch := ${ARCH}
+
+# Build Dir
+kBuildDirOsOsDT := ${kBuildDirOs}/build_dt
+kBuildDirOsOsFSBL := ${kBuildDirOs}/build_fsbl
+kBuildDirOsOsKernel := ${kBuildDirOs}/build_kernel
+kBuildDirOsOsUboot := ${kBuildDirOs}/build_uboot
+kBuildDirOsOsBootimg := ${kBuildDirOs}/bootimg
+
+# Output Dir
+kOutDirOsOsDT := ${kOutDirOs}/dt
+kOutDirOsOsFSBL := ${kOutDirOs}/fsbl
+kOutDirOsOsKernel := ${kOutDirOs}/kernel
+kOutDirOsOsUboot := ${kOutDirOs}/uboot
+kOutDirOsOsBootimg  := ${kOutDirOs}/bootimg
 
 ##################################################################
 
@@ -26,109 +53,101 @@ xsa_srcs_path = ${XSA_SRCS_PATH}
 # property for build dt #
 #########################
 kDTTarget := devicetree.dtb
-kDTTargetPath := ${kOutDirOsDT}/${kDTTarget}
+kDTTargetPath := ${kOutDirOsOsDT}/${kDTTarget}
 
 kDTBuildScriptDir := ${kSrcDirOs}/dt
 kDTBuildArgs := \
 	DT_TARGET=${kDTTargetPath} \
-	BUILD_DIR=${kBuildDirOsDT} \
-	OUTPUT_DIR=${kOutDirOsDT} \
-	XSCT_CLI=${xsct} \
-	XSA_SRCS_PATH=${xsa_srcs_path} \
+	BUILD_DIR=${kBuildDirOsOsDT} \
+	OUTPUT_DIR=${kOutDirOsOsDT} \
+	XSCT_CLI=${kXSCT} \
+	XSA_SRC_PATH=${kXSASrcPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 ###########################
 # property for build fsbl #
 ###########################
 kFSBLTarget := fsbl.elf
-kFSBLTargetPath := ${kOutDirOsFSBL}/${kFSBLTarget}
+kFSBLTargetPath := ${kOutDirOsOsFSBL}/${kFSBLTarget}
 
 kFSBLBuildScriptDir := ${kSrcDirOs}/fsbl
 kFSBLBuildArgs := \
 	FSBL_TARGET=${kFSBLTargetPath} \
-	BUILD_DIR=${kBuildDirOsFSBL} \
-	OUTPUT_DIR=${kOutDirOsFSBL} \
-	XSCT_CLI=${xsct} \
-	XSA_SRCS_PATH=${xsa_srcs_path} \
+	BUILD_DIR=${kBuildDirOsOsFSBL} \
+	OUTPUT_DIR=${kOutDirOsOsFSBL} \
+	XSCT_CLI=${kXSCT} \
+	XSA_SRC_PATH=${kXSASrcPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 #############################
 # property for build kernel #
 #############################
 kKernelTarget := uImage.bin
-kKernelTargetPath := ${kOutDirOsKernel}/${kKernelTarget}
+kKernelTargetPath := ${kOutDirOsOsKernel}/${kKernelTarget}
 
 kKernelBuildScriptDir := ${kSrcDirOs}/kernel
 kKernelBuildArgs := \
 	KERNEL_TARGET=${kKernelTargetPath} \
-	BUILD_DIR=${kBuildDirOsKernel} \
-	OUTPUT_DIR=${kOutDirOsKernel} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
-	ARCH=${ARCH} \
+	BUILD_DIR=${kBuildDirOsOsKernel} \
+	OUTPUT_DIR=${kOutDirOsOsKernel} \
+	CROSS_COMPILE=${kCC} \
+	ARCH=${kArch} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 #############################
 # property for build Uboot #
 #############################
 kUbootTarget := u-boot.elf
-kUbootTargetPath := ${kOutDirOsUboot}/${kUbootTarget}
+kUbootTargetPath := ${kOutDirOsOsUboot}/${kUbootTarget}
 
 kUbootBuildScriptDir := ${kSrcDirOs}/uboot
 kUbootlBuildArgs := \
 	UBOOT_TARGET=${kUbootTargetPath} \
-	BUILD_DIR=${kBuildDirOsUboot} \
-	OUTPUT_DIR=${kOutDirOsUboot} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
-	ARCH=${ARCH} \
+	BUILD_DIR=${kBuildDirOsOsUboot} \
+	OUTPUT_DIR=${kOutDirOsOsUboot} \
+	CROSS_COMPILE=${kCC} \
+	ARCH=${kArch} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
-
-###############################
-# property for build Busybox #
-##############################
-kBusyboxBuildScriptDir := ${kSrcDirOs}/busybox
-kBusyboxBuildArgs := \
-	BUILD_DIR=${kBuildDirOsBusybox} \
-	OUTPUT_DIR=${kOutDirOsBusybox} \
-	CROSS_COMPILE=${CROSS_COMPILE} \
-	ARCH=${ARCH} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 #########################
 # property for bootimg #
 ########################
 kBootimgTarget := boot.bin
-kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
+kBootimgTargetPath := ${kOutDirOsOsBootimg}/${kBootimgTarget}
 
 kBootimgBuildScriptDir := ${kSrcDirOs}/bootimg
 kBootimgBuildArgs := \
 	BOOTIMG_TARGET=${kBootimgTargetPath} \
-	BUILD_DIR=${kBuildDirOsBootimg} \
-	OUTPUT_DIR=${kOutDirOsBootimg} \
+	BUILD_DIR=${kBuildDirOsOsBootimg} \
+	OUTPUT_DIR=${kOutDirOsOsBootimg} \
 	FSBL_SRCS_PATH=${kFSBLTargetPath} \
-	XSA_SRCS_PATH=${kHwTargetPath} \
+	XSA_SRC_PATH=${kXSASrcPath} \
 	UBOOT_SRCS_PATH=${kUbootTargetPath} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
-#######################
-# property for rootfs #
-#######################
-kRoootFSTarget := rootfs.img
-kRootFSTargetPath := ${kOutDirOsRootFS}/${kRoootFSTarget}
 
-kRootFSBuildScriptDir := ${kSrcDirOs}/rootfs
-kRootFSBuildArgs := \
-	ROOTFS_TARGET=${kRootFSTargetPath} \
-	BUILD_DIR=${kBuildDirOsRootFS} \
-	OUTPUT_DIR=${kOutDirOsRootFS} \
-	BUSYBOX_SRCS_PATH=${kHwTargetPath} \
-	DTB_SRCS_PATH=${kFSBLTargetPath} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+.PHONY: \
+	distclean \
+	clean_bootimg \
+	clean_fsbl \
+	clean_uboot \
+	clean_dt \
+	clean_kernel \
+	all \
+	build_bootimg \
+	build_fsbl \
+	build_uboot \
+	build_dt \
+	build_kernel 
 
 
-make_rootfs: build_bootimg build_busybox build_dt build_kernel \
-		build_sw build_dropbear
-	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} 
+################################################################################
+#########
+# build #
+#########
+################################################################################
 
+all: build_bootimg build_dt build_kernel
 build_bootimg: build_fsbl build_uboot
 	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} 
 
@@ -138,11 +157,35 @@ build_fsbl:
 build_uboot:
 	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs}
 
-build_busybox: 
-	${MAKE} -C ${kBusyboxBuildScriptDir} ${kBusyboxBuildArgs}
-
 build_dt: 
 	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs}
 
 build_kernel:
 	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs}
+
+
+################################################################################
+#########
+# Clean #
+#########
+################################################################################
+
+clean_bootimg:
+	${MAKE} -C ${kBootimgBuildScriptDir} ${kBootimgBuildArgs} clean
+clean_fsbl:
+	${MAKE} -C ${kFSBLBuildScriptDir} ${kFSBLBuildArgs} clean
+clean_uboot:
+	${MAKE} -C ${kUbootBuildScriptDir} ${kUbootlBuildArgs} clean
+clean_dt:
+	${MAKE} -C ${kDTBuildScriptDir} ${kDTBuildArgs} clean
+clean_kernel:
+	${MAKE} -C ${kKernelBuildScriptDir} ${kKernelBuildArgs} clean
+
+
+distclean: \
+	clean_bootimg \
+	clean_fsbl \
+	clean_uboot \
+	clean_busybox \
+	clean_dt \
+	clean_kernel 
