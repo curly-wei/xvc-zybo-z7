@@ -15,7 +15,7 @@ kOutputDir := ${OUTPUT_DIR}
 kKernelSrcRemoteRepoUrl := https://github.com/Xilinx/linux-xlnx.git 
 #kKernelSrcRemoteRepoUrl := https://gitlab.com/linux-kernel/linux
 kKernelSrcRemoteBranchTag := master
-kKernelSrcLocalDirName := kernel_src
+kKernelSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
 kKernelSrcLocalPath := ${kBuildDir}/${kKernelSrcLocalDirName}
 
 kKernelConfName := xilinx_zynq_defconfig

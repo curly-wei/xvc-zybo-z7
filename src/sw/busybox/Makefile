@@ -23,7 +23,7 @@ kTarget := busybox
 
 kBusyboxSrcRemoteRepoUrl := https://git.busybox.net/busybox/
 kBusyboxSrcRemoteBranchTag := master
-kBusyboxSrcLocalDirName := busybox_src
+kBusyboxSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
 kBusyboxSrcLocalPath := ${kBuildDir}/${kBusyboxSrcLocalDirName}
 
 kBusyboxConfName := defconfig
@@ -42,7 +42,6 @@ kRootFolders := \
   /dev \
   /lib
 
-kPatchingCMD := 
 
 ################################################################################
 
@@ -76,7 +75,9 @@ kBuildArgs := \
 all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName} 
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName} CONFIG_TC=n
+	sed '/CONFIG_TCPSVD/s/.*//' -i ${kBusyboxSrcLocalPath}/.config
+	sed '/CONFIG_TC/s/.*//' -i ${kBusyboxSrcLocalPath}/.config
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} install
 	@for i in ${kRootFolders}; do \

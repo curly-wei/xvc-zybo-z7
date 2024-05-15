@@ -16,18 +16,16 @@ PROJ_OUTPUT_DIR ?= ${PROJ_BUILD_DIR}/out
 
 # Srcs Dirs
 kSrcDir := ${PROJ_ROOT_DIR}/src
-kSrcDirHw := ${kSrcDir}/hw
 kSrcDirOs := ${kSrcDir}/os
 kSrcDirSw := ${kSrcDir}/sw
 
 # Build Dirs
-kBuildDirHw := ${PROJ_BUILD_DIR}/hw
 kBuildDirSw := ${PROJ_BUILD_DIR}/sw
+kBuildDirOs := ${PROJ_BUILD_DIR}/os
 
 # Output Dirs
-kOutDirHw := ${PROJ_OUTPUT_DIR}/hw
 kOutDirSw := ${PROJ_OUTPUT_DIR}/sw
-
+kOutDirOs := ${PROJ_OUTPUT_DIR}/os
 
 #########################
 # property for Compiler #
@@ -50,20 +48,6 @@ ARCH ?= arm
 ##########################
 
 kUtilitiesTopPath := ${kSrcDir}/utilities
-
-#########################
-# property for build hw #
-#########################
-kHwTarget := xvc_server_hw.xsa
-kHwTargetPath := ${kOutDirHw}/${kHwTarget}
-
-kHwBuildScriptDir := ${kSrcDirHw}
-kHwBuildArgs := \
-	HW_TARGET=${kHwTargetPath} \
-	BUILD_DIR=${kBuildDirHw} \
-	OUTPUT_DIR=${kOutDirHw} \
-	VIVADO_CLI=${VIVADO_CLI} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
 
 #######################
 # property for rootfs #
@@ -95,6 +79,7 @@ necessary_exec_prog := \
 	bash \
 	unzip \
 	mkimage \
+	autoreconf \
 	dtc
 
 chk_env := $(foreach exec,$(necessary_exec_prog),\
@@ -109,13 +94,11 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 
 .PHONY: \
 	distclean \
-	clean_hw \
+	clean_rootfs \
 	clean_os \
 	clean_sw \
-	clean_rootfs \
 	all \
 	make_rootfs \
-	build_hw \
 	build_os \
 	build_sw
 
@@ -130,10 +113,7 @@ all: make_rootfs
 make_rootfs: build_sw 
 	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} 
 
-build_hw: 
-	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs}
-
-build_os: build_hw
+build_os: 
 	${MAKE} -C ${kOsBuildScriptDir} ${kOsBuildArgs}
 
 build_sw: build_os
@@ -147,8 +127,6 @@ build_sw: build_os
 ################################################################################
 clean_rootfs:
 	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} clean
-clean_hw:
-	${MAKE} -C ${kHwBuildScriptDir} ${kHwBuildArgs} clean
 clean_os: 
 	${MAKE} -C ${kOsBuildScriptDir} ${kOsBuildArgs} clean
 clean_sw:
@@ -156,5 +134,5 @@ clean_sw:
 
 distclean: \
 	clean_rootfs \
-	clean_hw \
+	clean_os \
 	clean_sw 

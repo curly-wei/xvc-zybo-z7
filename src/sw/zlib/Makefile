@@ -8,10 +8,14 @@ kSrcsDir := $(shell pwd)
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
+################################################################################
+########################
+## Please cheack here ##
+########################
 
 kZlibSrcRemoteRepoUrl := https://github.com/madler/zlib
 kZlibSrcRemoteBranchTag := master
-kZlibSrcLocalDirName := zlib_src
+kZlibSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
 kZlibSrcLocalPath := ${kBuildDir}/${kZlibSrcLocalDirName}
 
 
@@ -19,14 +23,23 @@ kTarget := $(basename $(notdir ${SW_TARGET_ZLIB}))
 kTargetExec := $(notdir ${SW_TARGET_ZLIB})
 kTargetExecPath := ${kOutputDir}/${kTargetExec}
 
-kDeps := \
-	${kCSrcsPath} \
-	${kMKUtilitiesTopPath} \
-	${kCHeadersPath}
-
-
+# Compiler
 kCC := ${CROSS_COMPILE}
 
+# cfg before make 
+kCfgArgs := \
+	CROSS_PREFIX=${kCC} \
+	${kZlibSrcLocalPath}/configure \
+	--prefix=${kOutputDir} #--static
+
+################################################################################
+
+kDeps := \
+	${kMKUtilitiesTopPath} 
+
+################################################################################
+# Run area below #
+################################################################################
 
 .PHONY: \
 	all \
@@ -38,9 +51,9 @@ all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} clone_remote_zlib_src 
 	$(call InfoPrint,"Start to build zlib")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	cd ${kZlibSrcLocalPath} && CROSS_PREFIX=${kCC} ./configure --prefix=${kOutputDir}
-	${MAKE} -C ${kZlibSrcLocalPath}
-	${MAKE} -C ${kZlibSrcLocalPath} install
+	cd ${kBuildDir} && ${kCfgArgs}
+	${MAKE} -C ${kBuildDir}
+	${MAKE} -C ${kBuildDir} install
 	$(call InfoPrint,"Build zlib has been completed")
 
 clone_remote_zlib_src:

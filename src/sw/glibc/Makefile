@@ -1,7 +1,75 @@
-## Notice
-## I just provide libc to arm-linux-gnueabihf-gcc14
-## For others version such arm-linux-gnueabihf-gccXX
-## please download from linaro which url can refer to gcc-14 version
-## and modify on this file
+# include utiluty
+kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
-kGlibcURL := https://snapshots.linaro.org/gnu-toolchain/14.0-2023.06-1/arm-linux-gnueabihf/sysroot-glibc-linaro-2.37.9000-2023.06-arm-linux-gnueabihf.tar.xz
+include ${kUtilitiesTopPath}/makefile/color_printer.mk
+
+# I/O/B dir
+kSrcsDir := $(shell pwd)
+kBuildDir := ${BUILD_DIR}
+kOutputDir := ${OUTPUT_DIR}
+
+################################################################################
+########################
+## Please cheack here ##
+########################
+
+kGlibcSrcRemoteRepoUrl := https://github.com/bminor/glibc
+kGlibcSrcRemoteBranchTag := master
+kGlibcSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
+kGlibcSrcLocalPath := ${kBuildDir}/${kGlibcSrcLocalDirName}
+
+kTarget := $(basename $(notdir ${SW_TARGET_GLIBC}))
+kTargetExec := $(notdir ${SW_TARGET_GLIBC})
+kTargetExecPath := ${kOutputDir}/${kTargetExec}
+
+# Compiler
+kCC := ${CROSS_COMPILE:-=}
+
+# cfg before make 
+kCfgArgs := \
+	${kGlibcSrcLocalPath}/configure \
+	--prefix=${kOutputDir} \
+	--build=$(shell uname -m) \
+	--host=${kCC}
+
+################################################################################
+
+kDeps := \
+	${kMKUtilitiesTopPath} 
+
+################################################################################
+# Run area below #
+################################################################################
+
+.PHONY: \
+	all \
+	clone_remote_glibc_src \
+	clean 
+#.NOTPARALLEL:
+
+all: ${kTargetExecPath}
+${kTargetExecPath}: ${kDeps} clone_remote_glibc_src 
+	$(call InfoPrint,"Start to build glibc")
+	mkdir -p ${kBuildDir} ${kOutputDir} 
+	cd ${kBuildDir} && ${kCfgArgs}
+	${MAKE} -C ${kBuildDir}
+	${MAKE} -C ${kBuildDir} install
+	$(call InfoPrint,"Build glibc has been completed")
+
+clone_remote_glibc_src:
+	$(call InfoPrint,"Check Remote/Local Repository...")
+	@if [ ! -d ${kGlibcSrcLocalPath} ]; then \
+		echo "Remote repository doesn't exist in local, cloning...";\
+		git clone \
+		--depth=1 \
+		--branch=${kGlibcSrcRemoteBranchTag} \
+		${kGlibcSrcRemoteRepoUrl} ${kGlibcSrcLocalPath}; \
+	else \
+		echo "Remote repository exist in local, check newest..."; \
+		cd ${kGlibcSrcLocalPath}; \
+		git pull ${kGlibcSrcRemoteRepoUrl}; \
+	fi	
+
+clean: 
+	$(call InfoPrint,"Clean glibc build/out directories")
+	rm -rf ${kBuildDir} ${kOutputDir}

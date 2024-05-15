@@ -1,5 +1,5 @@
-# https://wiki.beyondlogic.org/index.php?title=Cross_Compiling_BusyBox_for_ARM#DropBear_.28Optional.29
-# ./configure --prefix=`pwd`/out --host=arm-linux-gnueabihf --with-zlib=../zlib/out  
+# ./openssl/config linux-armv4 shared -march=armv7-a --cross-compile-prefix=arm-linux-gnueabihf- --prefix=`pwd`/out  
+# git clone  https://github.com/openssl/openssl.git 
 
 # include utiluty
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
@@ -15,31 +15,33 @@ kOutputDir := ${OUTPUT_DIR}
 ########################
 ## Please cheack here ##
 ########################
-kZLibSrcsPath := ${ZLIB_SRCS_PATH}
 
-kDropbearSrcRemoteRepoUrl := https://github.com/mkj/dropbear
-kDropbearSrcRemoteBranchTag := master
-kDropbearSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
-kDropbearSrcLocalPath := ${kBuildDir}/${kDropbearSrcLocalDirName}
+kOpensslSrcRemoteRepoUrl := https://github.com/openssl/openssl.git 
+kOpensslSrcRemoteBranchTag := master
+kOpensslSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
+kOpensslSrcLocalPath := ${kBuildDir}/${kOpensslSrcLocalDirName}
 
-kTarget := $(basename $(notdir ${SW_TARGET_DROPBEAR}))
-kTargetExec := $(notdir ${SW_TARGET_DROPBEAR})
+kTarget := $(basename $(notdir ${SW_TARGET_OPENSSL}))
+kTargetExec := $(notdir ${SW_TARGET_OPENSSL})
 kTargetExecPath := ${kOutputDir}/${kTargetExec}
 
 # Compiler
-kCC := ${CROSS_COMPILE:-=}
+kCC := ${CROSS_COMPILE}
 
 # cfg before make 
 kCfgArgs := \
-	${kDropbearSrcLocalPath}/configure \
-	--prefix=${kOutputDir} \
-	--with-zlib=${kZLibSrcsPath} \
-	--host=${kCC}
+	${kOpensslSrcLocalPath}/Configure \
+	linux-armv4 \
+	shared \
+	-march=armv7-a \
+	--cross-compile-prefix=${kCC} \
+	--prefix=${kOutputDir}
 
 ################################################################################
 
 kDeps := \
 	${kMKUtilitiesTopPath} 
+
 
 ################################################################################
 # Run area below #
@@ -47,35 +49,35 @@ kDeps := \
 
 .PHONY: \
 	all \
-	clone_remote_dropbear_src \
+	clone_remote_openssl_src \
 	clean 
 #.NOTPARALLEL:
 
 
 all: ${kTargetExecPath}
-${kTargetExecPath}: ${kDeps} clone_remote_dropbear_src 
-	$(call InfoPrint,"Start to build dropbear")
+${kTargetExecPath}: ${kDeps} clone_remote_openssl_src 
+	$(call InfoPrint,"Start to build openssl")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	cd ${kBuildDir} && ${kCfgArgs}
 	${MAKE} -C ${kBuildDir}
 	${MAKE} -C ${kBuildDir} install
-	$(call InfoPrint,"Build dropbear has been completed")
+	$(call InfoPrint,"Build openssl has been completed")
 
 
-clone_remote_dropbear_src:
+clone_remote_openssl_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kDropbearSrcLocalPath} ]; then \
+	@if [ ! -d ${kOpensslSrcLocalPath} ]; then \
 		echo "Remote repository doesn't exist in local, cloning...";\
 		git clone \
 		--depth=1 \
-		--branch=${kDropbearSrcRemoteBranchTag} \
-		${kDropbearSrcRemoteRepoUrl} ${kDropbearSrcLocalPath}; \
+		--branch=${kOpensslSrcRemoteBranchTag} \
+		${kOpensslSrcRemoteRepoUrl} ${kOpensslSrcLocalPath}; \
 	else \
 		echo "Remote repository exist in local, check newest..."; \
-		cd ${kDropbearSrcLocalPath}; \
-		git pull ${kDropbearSrcRemoteRepoUrl}; \
+		cd ${kOpensslSrcLocalPath}; \
+		git pull ${kOpensslSrcRemoteRepoUrl}; \
 	fi	
 
 clean: 
-	$(call InfoPrint,"Clean dropbear build/out directories")
+	$(call InfoPrint,"Clean openssl build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}

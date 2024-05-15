@@ -27,18 +27,22 @@ kCC := ${CROSS_COMPILE}
 kArch := ${ARCH}
 
 # Build Dir
-kBuildDirSwSwGlibc:= ${kBuildDirSw}/build_glibc
-kBuildDirSwSwZlib := ${kBuildDirSw}/build_zlib
-kBuildDirSwSwDropbear := ${kBuildDirSw}/build_dropbear
-kBuildDirSwSwXVCServer := ${kBuildDirSw}/build_xvc_server
+kBuildDirSwGlibc:= ${kBuildDirSw}/build_glibc
+kBuildDirSwZlib := ${kBuildDirSw}/build_zlib
+kBuildDirSwDropbear := ${kBuildDirSw}/build_dropbear
+kBuildDirSwOpenssh := ${kBuildDirSw}//build_openssh
+kBuildDirSwOpenssl := ${kBuildDirSw}//build_openssl
+kBuildDirSwXVCServer := ${kBuildDirSw}/build_xvc_server
 kBuildDirSwOsBusybox := ${kBuildDirSw}/build_busybox
 
 
 # Output Dir
-kOutDirSwSwGlibc := ${kOutDirSw}/glibc
-kOutDirSwSwZlib := ${kOutDirSw}/zlib
-kOutDirSwSwDropbear := ${kOutDirSw}/dropbear
-kOutDirSwSwXVCServer := ${kOutDirSw}/xvc_server
+kOutDirSwGlibc := ${kOutDirSw}/glibc
+kOutDirSwZlib := ${kOutDirSw}/zlib
+kOutDirSwDropbear := ${kOutDirSw}/dropbear
+kOutDirSwOpenssh := ${kOutDirSw}/openssh
+kOutDirSwOpenssl := ${kOutDirSw}/openssl
+kOutDirSwXVCServer := ${kOutDirSw}/xvc_server
 kOutDirSwOsBusybox := ${kOutDirSw}/busybox
 
 ##################################################################
@@ -47,28 +51,29 @@ kOutDirSwOsBusybox := ${kOutDirSw}/busybox
 ###############################
 # property for build glibc #
 ##############################
-kGlibcTarget := glibc.so
-kGlibcTargetPath := ${kOutDirSwSwGlibc}/${kGlibcTarget}
+kGlibcTarget := libc.so
+kGlibcTargetPath := ${kOutDirSwGlibc}/lib/${kGlibcTarget}
 
-kGlibcBuildScriptDir := ${kSrcDirSw}/Glibc
+kGlibcBuildScriptDir := ${kSrcDirSw}/glibc
 kGlibcBuildArgs := \
-	SW_TARGET_GLIBC=${kGlibcTarget} \
-	BUILD_DIR=${kBuildDirSwSwGlibc} \
-	OUTPUT_DIR=${kOutDirSwSwGlibc} \
+	SW_TARGET_GLIBC=${kGlibcTargetPath} \
+	BUILD_DIR=${kBuildDirSwGlibc} \
+	OUTPUT_DIR=${kOutDirSwGlibc} \
 	CROSS_COMPILE=${kCC} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
 
 ###############################
 # property for build zlib #
 ##############################
 kZlibTarget := libz.so
-kZlibTargetPath := ${kOutDirSwSwZlib}/${kZlibTarget}
+kZlibTargetPath := ${kOutDirSwZlib}/lib/${kZlibTarget}
 
 kZlibBuildScriptDir := ${kSrcDirSw}/zlib
 kZlibBuildArgs := \
-	SW_TARGET_ZLIB=${kZlibTarget} \
-	BUILD_DIR=${kBuildDirSwSwZlib} \
-	OUTPUT_DIR=${kOutDirSwSwZlib} \
+	SW_TARGET_ZLIB=${kZlibTargetPath} \
+	BUILD_DIR=${kBuildDirSwZlib} \
+	OUTPUT_DIR=${kOutDirSwZlib} \
 	CROSS_COMPILE=${kCC} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
@@ -77,32 +82,65 @@ kZlibBuildArgs := \
 # property for build Dropbear #
 ##############################
 kDropbearTarget := dropbear
-kDropbearTargetPath := ${kOutDirSwSwDropbear}/${kDropbearTarget}
+kDropbearTargetPath := ${kOutDirSwDropbear}/bin/${kDropbearTarget}
 
 kDropbearBuildScriptDir := ${kSrcDirSw}/dropbear
 kDropbearBuildArgs := \
-	SW_TARGET_DROPBEAR=${kDropbearTarget} \
-	BUILD_DIR=${kBuildDirSwSwDropbear} \
-	OUTPUT_DIR=${kOutDirSwSwDropbear} \
+	SW_TARGET_DROPBEAR=${kDropbearTargetPath} \
+	BUILD_DIR=${kBuildDirSwDropbear} \
+	OUTPUT_DIR=${kOutDirSwDropbear} \
 	CROSS_COMPILE=${kCC} \
-	ARCH=${kArch} \
-	ZLIB_SRC_PATH=${kZlibTargetPath} \
+	ZLIB_SRCS_PATH=${kOutDirSwZlib} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+###############################
+# property for build openssh #
+##############################
+kOpensshTarget := sshd
+kOpensshTargetPath := ${kOutDirSwOpenssh}/sbin/${kOpensshTarget}
+
+kOpensshBuildScriptDir := ${kSrcDirSw}/openssh
+kOpensshBuildArgs := \
+	SW_TARGET_OPENSSH=${kOpensshTargetPath} \
+	BUILD_DIR=${kBuildDirSwOpenssh} \
+	OUTPUT_DIR=${kOutDirSwOpenssh} \
+	CROSS_COMPILE=${kCC} \
+	ZLIB_SRCS_PATH=${kOutDirSwZlib} \
+	OPENSSL_SRCS_PATH=${kOutDirSwOpenssl} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+###############################
+# property for build openssl #
+##############################
+kOpensslTarget := openssl
+kOpensslTargetPath := ${kOutDirSwOpenssl}/bin/${kOpensslTarget}
+
+kOpensslBuildScriptDir := ${kSrcDirSw}/openssl
+kOpensslBuildArgs := \
+	SW_TARGET_OPENSSL=${kOpensslTargetPath} \
+	BUILD_DIR=${kBuildDirSwOpenssl} \
+	OUTPUT_DIR=${kOutDirSwOpenssl} \
+	CROSS_COMPILE=${kCC} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
 
 
 #################################
 # property for build xvc server #
 #################################
-kSwTarget := xvc_server.elf
-kSwTargetPath := ${kOutDirSwSwXVCServer}/${kSwTarget}
+kXvcServerTarget := xvc_server.elf
+kXvcServerTargetPath := ${kOutDirSwXVCServer}/bin/${kXvcServerTarget}
 
 kXVCServerBuildScriptDir := ${kSrcDirSw}/xvc_server
 kXVCServerBuildArgs := \
-	SW_TARGET_XVC_SERVER=${kSwTargetPath} \
-	BUILD_DIR=${kBuildDirSwSwXVCServer} \
-	OUTPUT_DIR=${kOutDirSwSwXVCServer} \
+	SW_TARGET_XVC_SERVER=${kXvcServerTargetPath} \
+	BUILD_DIR=${kBuildDirSwXVCServer} \
+	OUTPUT_DIR=${kOutDirSwXVCServer} \
 	CROSS_COMPILE=${kCC} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath} 
+
 
 ###############################
 # property for build Busybox #
@@ -116,27 +154,31 @@ kBusyboxBuildArgs := \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
 
-.PHONY: \
-	distclean \
-	clean_glibc \
-	clean_zlib \
-	clean_dropbear \
-	clean_xvc_server \
-	clean_busybox \
-	all \
-	build_glibc \
-	build_zlib \
-	build_dropbear \
-	build_xvc_server \
-	build_busybox
-
 ################################################################################
 #########
 # build #
 #########
 ################################################################################
 
-all: build_glibc build_dropbear build_xvc_server
+.PHONY: \
+	distclean \
+	clean_glibc \
+	clean_zlib \
+	clean_dropbear \
+	clean_openssh \
+	clean_openssl \
+	clean_xvc_server \
+	clean_busybox \
+	all \
+	build_glibc \
+	build_zlib \
+	build_dropbear \
+	build_openssh \
+	build_openssl \
+	build_xvc_server \
+	build_busybox
+
+all: build_glibc build_openssh build_xvc_server
 build_glibc:
 	${MAKE} -C ${kGlibcBuildScriptDir} ${kGlibcBuildArgs} 
 
@@ -145,6 +187,12 @@ build_zlib:
 
 build_dropbear: build_zlib
 	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
+
+build_openssh: #build_openssl
+	${MAKE} -C ${kOpensshBuildScriptDir} ${kOpensshBuildArgs}
+
+build_openssl:
+	${MAKE} -C ${kOpensslBuildScriptDir} ${kOpensslBuildArgs}
 
 build_xvc_server:
 	${MAKE} -C ${kXVCServerBuildScriptDir} ${kXVCServerBuildArgs}
@@ -164,6 +212,10 @@ clean_zlib:
 	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs} clean
 clean_dropbear:
 	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs} clean
+clean_openssh:
+	${MAKE} -C ${kOpensshBuildScriptDir} ${kOpensshBuildArgs} clean
+clean_openssl:
+	${MAKE} -C ${kOpensslBuildScriptDir} ${kOpensslBuildArgs} clean
 clean_xvc_server:
 	${MAKE} -C ${kXVCServerBuildScriptDir} ${kXVCServerBuildArgs} clean
 clean_busybox:

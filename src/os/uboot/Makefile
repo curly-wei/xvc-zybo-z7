@@ -15,7 +15,7 @@ kOutputDir := ${OUTPUT_DIR}
 
 kUbootSrcRemoteRepoUrl := https://github.com/u-boot/u-boot.git
 kUbootSrcRemoteBranchTag := master
-kUbootSrcLocalDirName := uboot_src
+kUbootSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
 kUbootSrcLocalPath := ${kBuildDir}/${kUbootSrcLocalDirName}
 
 kUbootConfName := xilinx_zynq_virt_defconfig
@@ -29,15 +29,15 @@ kUbootGenDir := ${kUbootSrcLocalPath}
 kUbootGenFileName := ${kTarget}
 kUbootGenFilePath := ${kUbootGenDir}/${kUbootGenFileName}
 
+# Compiler
+kCC := ${CROSS_COMPILE}
+kARCH := ${ARCH}
+
 ################################################################################
 
 kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
 kDeps := \
 	${kMKUtilitiesTopPath}
-
-# Compiler
-kCC := ${CROSS_COMPILE}
-kARCH := ${ARCH}
 
 kBuildArgs := \
 	CROSS_COMPILE=${kCC} \

@@ -5,7 +5,6 @@ include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
-kXSASrcPath := ${XSA_SRC_PATH}
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
@@ -13,9 +12,10 @@ kOutputDir := ${OUTPUT_DIR}
 ########################
 ## Please cheack here ##
 ########################
+kXSASrcPath := ${XSA_SRC_PATH}
 
 kBuildTCLScript := build_fsbl.tcl
-################################################################################
+
 
 kBuildTCLScriptPath := ${kSrcsDir}/${kBuildTCLScript}
 
@@ -29,11 +29,6 @@ kFSBLGenDir := ${kBuildDir}/${kTarget}/Debug
 kFSBLGenFileName := ${kTargetExec}
 kFSBLGenPath := ${kFSBLGenDir}/${kFSBLGenFileName}
 
-kDeps := \
-	${kXSASrcPath} \
-	${kBuildTCLScriptPath} \
-	${kTCLUtilitiesTopPath}
-
 # Compiler
 kXsctCLI := ${XSCT_CLI}
 kXsctCLIArgs := \
@@ -42,6 +37,14 @@ kXsctCLIArgs := \
 	-t ${kTarget} \
 	-U ${kTCLUtilitiesTopPath} \
 	-x ${kXSASrcPath} 
+
+
+################################################################################
+
+kDeps := \
+	${kXSASrcPath} \
+	${kBuildTCLScriptPath} \
+	${kTCLUtilitiesTopPath}
 
 
 ################################################################################
