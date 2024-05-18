@@ -30,8 +30,8 @@ kArch := ${ARCH}
 kBuildDirSwGlibc:= ${kBuildDirSw}/build_glibc
 kBuildDirSwZlib := ${kBuildDirSw}/build_zlib
 kBuildDirSwDropbear := ${kBuildDirSw}/build_dropbear
-kBuildDirSwOpenssh := ${kBuildDirSw}//build_openssh
-kBuildDirSwOpenssl := ${kBuildDirSw}//build_openssl
+kBuildDirSwOpenssh := ${kBuildDirSw}/build_openssh
+kBuildDirSwOpenssl := ${kBuildDirSw}/build_openssl
 kBuildDirSwXVCServer := ${kBuildDirSw}/build_xvc_server
 kBuildDirSwOsBusybox := ${kBuildDirSw}/build_busybox
 

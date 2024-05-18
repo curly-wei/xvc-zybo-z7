@@ -2,6 +2,7 @@
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -58,17 +59,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_glibc_src
 
 clone_remote_glibc_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kGlibcSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kGlibcSrcRemoteBranchTag} \
-		${kGlibcSrcRemoteRepoUrl} ${kGlibcSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kGlibcSrcLocalPath}; \
-		git pull ${kGlibcSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kGlibcSrcRemoteRepoUrl},\
+		${kGlibcSrcRemoteBranchTag},\
+		${kGlibcSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean glibc build/out directories")

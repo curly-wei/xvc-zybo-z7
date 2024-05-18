@@ -2,6 +2,7 @@
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -89,7 +90,7 @@ build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
 	${kTargetExecPath}: 
 
 
-gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx clone_remote_dt_src_digilent
+gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx 
 	$(call InfoPrint,"Start to build dt")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${kXsctCLI} ${kBuildTCLScript} ${kXsctCLIArgs}
@@ -100,17 +101,11 @@ gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx clone_remote_dt_src_digil
 
 clone_remote_dt_src_xilinx:
 	$(call InfoPrint,"Check Remote/Local Xilinx Repository...")
-	@if [ ! -d ${kXilDTSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kXilDTSrcRemoteBranchTag} \
-		${kXilDTSrcRepoURL} ${kXilDTSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kXilDTSrcLocalPath}; \
-		git pull ${kXilDTSrcRepoURL}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kXilDTSrcRepoURL},\
+		${kXilDTSrcRemoteBranchTag},\
+		${kXilDTSrcLocalPath},\
+	)
 
 clone_remote_dt_src_digilent:
 	$(call InfoPrint,"Check Remote/Local Digilent DT...")

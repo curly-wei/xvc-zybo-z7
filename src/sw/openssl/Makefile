@@ -1,10 +1,8 @@
-# ./openssl/config linux-armv4 shared -march=armv7-a --cross-compile-prefix=arm-linux-gnueabihf- --prefix=`pwd`/out  
-# git clone  https://github.com/openssl/openssl.git 
-
 # include utiluty
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -66,17 +64,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_openssl_src
 
 clone_remote_openssl_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kOpensslSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kOpensslSrcRemoteBranchTag} \
-		${kOpensslSrcRemoteRepoUrl} ${kOpensslSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kOpensslSrcLocalPath}; \
-		git pull ${kOpensslSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kOpensslSrcRemoteRepoUrl},\
+		${kOpensslSrcRemoteBranchTag},\
+		${kOpensslSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean openssl build/out directories")

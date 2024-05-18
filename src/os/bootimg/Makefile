@@ -20,9 +20,9 @@ kTargetExecPath := ${kOutputDir}/${kTargetExec}
 kBootbifName := ${kTarget}img.bif
 kBootbifPath := ${kBuildDir}/${kBootbifName}
 
+kFSBLSrcsPath := ${FSBL_SRCS_PATH}
 kXSASrcPath := ${XSA_SRC_PATH}
 kUbootSrcsPath := ${UBOOT_SRCS_PATH}
-kFSBLSrcsPath := ${FSBL_SRCS_PATH}
 
 kFPGABitTargetName := ${basename ${notdir ${kXSASrcPath}}}.bit
 kFPGABitTargetPath := ${kBuildDir}/${kFPGABitTargetName}

@@ -49,6 +49,7 @@ kDeps := \
 
 all: ${kTargetExecPath}
 ${kTargetExecPath}: ${kDeps} clone_remote_zlib_src 
+	echo ${kTargetExecPath}
 	$(call InfoPrint,"Start to build zlib")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	cd ${kBuildDir} && ${kCfgArgs}

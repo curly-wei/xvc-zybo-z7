@@ -5,6 +5,7 @@
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -64,17 +65,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_dropbear_src
 
 clone_remote_dropbear_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kDropbearSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kDropbearSrcRemoteBranchTag} \
-		${kDropbearSrcRemoteRepoUrl} ${kDropbearSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kDropbearSrcLocalPath}; \
-		git pull ${kDropbearSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kDropbearSrcRemoteRepoUrl},\
+		${kDropbearSrcRemoteBranchTag},\
+		${kDropbearSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean dropbear build/out directories")

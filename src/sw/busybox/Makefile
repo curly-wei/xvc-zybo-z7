@@ -2,6 +2,7 @@
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -58,7 +59,7 @@ kARCH := ${ARCH}
 kBuildArgs := \
 	CROSS_COMPILE=${kCC} \
 	ARCH=${kARCH} \
-	INSTALL_PATH=${kOutputDir}
+	CONFIG_PREFIX=${kOutputDir}
 
 
 ################################################################################
@@ -72,12 +73,16 @@ kBuildArgs := \
 #.NOTPARALLEL:
 
 
+## Regarding:
+## sleep 1 && sed '/CONFIG_TCPSVD=y/..... 
+## Here is patching for bug of TC
+## If the bug will be fix in the future, remove these line
 all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName} CONFIG_TC=n
-	sed '/CONFIG_TCPSVD/s/.*//' -i ${kBusyboxSrcLocalPath}/.config
-	sed '/CONFIG_TC/s/.*//' -i ${kBusyboxSrcLocalPath}/.config
+	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName}
+	sleep 1 && sed '/CONFIG_TCPSVD=y/s/.*/CONFIG_TCPSVD=n/' -i ${kBusyboxSrcLocalPath}/.config
+	sleep 1 && sed '/CONFIG_TC=y/s/.*/CONFIG_TC=n/' -i ${kBusyboxSrcLocalPath}/.config
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} install
 	@for i in ${kRootFolders}; do \
@@ -86,19 +91,14 @@ all: clone_remot_busybox_src ${kDeps}
 	cp ${kFSTabPath} ${kFSTabOutDest}
 	$(call InfoPrint,"Build xvc_os_busybox has been completed")
 
+
 clone_remot_busybox_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kBusyboxSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kBusyboxSrcRemoteBranchTag} \
-		${kBusyboxSrcRemoteRepoUrl} ${kBusyboxSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kBusyboxSrcLocalPath}; \
-		git pull ${kBusyboxSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kBusyboxSrcRemoteRepoUrl},\
+		${kBusyboxSrcRemoteBranchTag},\
+		${kBusyboxSrcLocalPath},\
+	)
 
 clean:
 	$(call InfoPrint,"Clean xvc_os_busybox build/out directories")

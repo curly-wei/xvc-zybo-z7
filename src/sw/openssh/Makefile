@@ -1,12 +1,8 @@
-# autoreconf
-#./configure --host=arm-linux-gnueabihf --with-zlib=../../zlib/out --with-ssl-dir=../../openssh/out --prefix=`pwd`/out --disable-strip 
-# git clone https://github.com/openssh/openssh-portable  
-
-
 # include utiluty
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -22,8 +18,8 @@ kZLibSrcsPath := ${ZLIB_SRCS_PATH}
 kOpensslSrcsPath := ${OPENSSL_SRCS_PATH}
 
 kOpensshSrcRemoteRepoUrl := https://github.com/openssh/openssh-portable
-kOpensshSrcRemoteBranchTag := $(basename $(notdir ${kSrcsDir}))_src
-kOpensshSrcLocalDirName := openssh_src
+kOpensshSrcRemoteBranchTag := master
+kOpensshSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
 kOpensshSrcLocalPath := ${kBuildDir}/${kOpensshSrcLocalDirName}
 
 kTarget := $(basename $(notdir ${SW_TARGET_OPENSSL}))
@@ -72,17 +68,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_openssh_src
 
 clone_remote_openssh_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kOpensshSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kOpensshSrcRemoteBranchTag} \
-		${kOpensshSrcRemoteRepoUrl} ${kOpensshSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kOpensshSrcLocalPath}; \
-		git pull ${kOpensshSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kOpensshSrcRemoteRepoUrl},\
+		${kOpensshSrcRemoteBranchTag},\
+		${kOpensshSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean openssh build/out directories")

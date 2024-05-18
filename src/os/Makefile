@@ -53,22 +53,6 @@ kOutDirOsKernel := ${kOutDirOs}/kernel
 ##################################################################
 
 #########################
-# property for bootimg #
-########################
-kBootimgTarget := boot.bin
-kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
-
-kBootimgBuildScriptDir := ${kSrcDirOs}/bootimg
-kBootimgBuildArgs := \
-	BOOTIMG_TARGET=${kBootimgTargetPath} \
-	BUILD_DIR=${kBuildDirOsBootimg} \
-	OUTPUT_DIR=${kOutDirOsBootimg} \
-	FSBL_SRCS_PATH=${kFSBLTargetPath} \
-	XSA_SRC_PATH=${kHwTargetPath} \
-	UBOOT_SRCS_PATH=${kUbootTargetPath} \
-	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
-
-#########################
 # property for build hw #
 #########################
 kHwTarget := xvc_server_hw.xsa
@@ -142,22 +126,39 @@ kKernelBuildArgs := \
 	ARCH=${kArch} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
+#########################
+# property for bootimg #
+########################
+kBootimgTarget := boot.bin
+kBootimgTargetPath := ${kOutDirOsBootimg}/${kBootimgTarget}
+
+kBootimgBuildScriptDir := ${kSrcDirOs}/bootimg
+kBootimgBuildArgs := \
+	BOOTIMG_TARGET=${kBootimgTargetPath} \
+	BUILD_DIR=${kBuildDirOsBootimg} \
+	OUTPUT_DIR=${kOutDirOsBootimg} \
+	FSBL_SRCS_PATH=${kFSBLTargetPath} \
+	XSA_SRC_PATH=${kHwTargetPath} \
+	UBOOT_SRCS_PATH=${kUbootTargetPath} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
 
 .PHONY: \
 	distclean \
-	clean_bootimg \
 	clean_hw \
 	clean_fsbl \
 	clean_uboot \
 	clean_dt \
 	clean_kernel \
+	clean_bootimg \
 	all \
-	build_bootimg \
 	build_hw \
 	build_fsbl \
 	build_uboot \
 	build_dt \
-	build_kernel 
+	build_kernel \
+	build_bootimg 
 
 
 ################################################################################

@@ -2,6 +2,7 @@
 kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
 
 include ${kUtilitiesTopPath}/makefile/color_printer.mk
+include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -65,17 +66,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_uboot_src
 
 clone_remote_uboot_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kUbootSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kUbootSrcRemoteBranchTag} \
-		${kUbootSrcRemoteRepoUrl} ${kUbootSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kUbootSrcLocalPath}; \
-		git pull ${kUbootSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kUbootSrcRemoteRepoUrl},\
+		${kUbootSrcRemoteBranchTag},\
+		${kUbootSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean xvc_os_uboot build/out directories")
