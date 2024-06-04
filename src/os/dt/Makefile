@@ -1,8 +1,7 @@
 # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
-
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
-include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -51,8 +50,7 @@ kBuildDTSrcsPath := \
 
 ################################################################################
 
-kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
-kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+kTCLUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/tcl/*.tcl)
 
 kDepsBaseDT := \
 	${kXSASrcsPath} \
@@ -68,7 +66,7 @@ kXsctCLI := ${XSCT_CLI}
 kXsctCLIArgs := \
 	-B ${kBuildDir} \
 	-O ${kBaseDTOutputDir} \
-	-U ${kTCLUtilitiesTopPath} \
+	-U "${kTCLUtilitiesTopPath}" \
 	-x ${kXSASrcsPath} \
 	-R ${kXilDTSrcLocalPath}
 
@@ -81,16 +79,16 @@ kXsctCLIArgs := \
 	build_dt \
 	gen_base_dt \
 	clone_remote_dt_src_xilinx \
+	clone_remote_dt_src_digilent \
 	clean
 #.NOTPARALLEL:
 
 all: gen_base_dt
 
-build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
-	${kTargetExecPath}: 
+#build_dt: ${kDepsBuildDT} gen_base_dt ${kTargetExecPath}
 
 
-gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx 
+gen_base_dt: ${kDepsBaseDT} clone_remote_dt_src_xilinx clone_remote_dt_src_digilent
 	$(call InfoPrint,"Start to build dt")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${kXsctCLI} ${kBuildTCLScript} ${kXsctCLIArgs}

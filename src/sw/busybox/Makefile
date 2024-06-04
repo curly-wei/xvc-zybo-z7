@@ -1,8 +1,7 @@
  # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
-
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
-include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -46,7 +45,7 @@ kRootFolders := \
 
 ################################################################################
 
-kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+
 
 kDeps := \
 	${kSrcs}	\
@@ -81,13 +80,12 @@ all: clone_remot_busybox_src ${kDeps}
 	$(call InfoPrint,"Start to build busybox")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} ${kBusyboxConfName}
-	sleep 1 && sed '/CONFIG_TCPSVD=y/s/.*/CONFIG_TCPSVD=n/' -i ${kBusyboxSrcLocalPath}/.config
-	sleep 1 && sed '/CONFIG_TC=y/s/.*/CONFIG_TC=n/' -i ${kBusyboxSrcLocalPath}/.config
+	sleep 1 && \
+	sed '/CONFIG_TCPSVD=y/s/.*/CONFIG_TCPSVD=n/' -i ${kBusyboxSrcLocalPath}/.config
+	sleep 1 && \
+	sed '/CONFIG_TC=y/s/.*/CONFIG_TC=n/' -i ${kBusyboxSrcLocalPath}/.config
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs}
 	${MAKE} -C ${kBusyboxSrcLocalPath} ${kBuildArgs} install
-	@for i in ${kRootFolders}; do \
-	 	mkdir -p ${kOutputDir}/$${i}; \
-	done	
 	cp ${kFSTabPath} ${kFSTabOutDest}
 	$(call InfoPrint,"Build xvc_os_busybox has been completed")
 

@@ -1,9 +1,10 @@
 PROJ_ROOT_DIR ?= $(shell realpath `pwd`/../../)
 
-# include utiluty
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}# include utiluty
 UTILITIES_TOP_DIR ?= $(shell realpath ${PROJ_ROOT_DIR}/src/utilities)
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
+
 
 
 #########################################################

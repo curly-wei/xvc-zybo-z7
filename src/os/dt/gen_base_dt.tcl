@@ -20,15 +20,17 @@ foreach iter ${requiredParameters} {
     switch $arg(${iter}) \
       $arg(B) { set kBuildDir $arg(${iter}) }\
       $arg(O) { set kOutputDir $arg(${iter}) } \
-      $arg(U) { set kTCLUtilitiesTopDir $arg(${iter}) }\
+      $arg(U) { set kTCLUtilitiesTopPath $arg(${iter}) }\
       $arg(x) { set kXSAFilePath $arg(${iter}) }\
       $arg(R) { set kXilDTSrcLocalPath $arg(${iter}) }\
       default { error "Input arguments error" }
   }
 }
 
-# include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/color_render.tcl
+# Scan and Read-in tcl utilities
+foreach tcl_utility_files ${kTCLUtilitiesTopPath} {
+  source ${tcl_utility_files}
+}
 
 puts [InfoStr "-----------------------------------------------"]
 puts [InfoStr "Start to Generate Device Tree for xvc"]

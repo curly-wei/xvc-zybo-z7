@@ -7,7 +7,6 @@
 ###
 
 
-
 ###
 # @brief: Color renderning Green(info) and output to stdout
 # @param ${1}: Input string
@@ -15,7 +14,7 @@
 define InfoPrint 
 	@$(eval kColorGreen := '\e[1;32m')
 	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)"[UserINFO]: "${1}$(kColorEnd)
+	@echo -e $(kColorGreen)"[UserInfoMake]: "${1}$(kColorEnd)
 endef
 
 ###
@@ -25,5 +24,5 @@ endef
 define ErrorPrint 
 	@$(eval kColorRed := '\e[1;31m')
 	@$(eval kColorEnd := '\e[0m')
-	@echo -e $(kColorGreen)"[Error]: "${1}$(kColorEnd) >&2
+	@echo -e $(kColorGreen)"[UserErrorMake]: "${1}$(kColorEnd) >&2
 endef

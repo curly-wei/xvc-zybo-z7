@@ -10,7 +10,7 @@
 # Check if script is running in correct Vivado version.
 ################################################################
 proc init_xcv_system_bd {design_name} {
-   set scripts_vivado_version 2023.2
+   set scripts_vivado_version 2024.1
    set current_vivado_version [version -short]
 
    if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {

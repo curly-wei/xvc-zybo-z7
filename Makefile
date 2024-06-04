@@ -20,12 +20,14 @@ kSrcDirOs := ${kSrcDir}/os
 kSrcDirSw := ${kSrcDir}/sw
 
 # Build Dirs
-kBuildDirSw := ${PROJ_BUILD_DIR}/sw
 kBuildDirOs := ${PROJ_BUILD_DIR}/os
+kBuildDirSw := ${PROJ_BUILD_DIR}/sw
+kBuildDirRoootfs := ${PROJ_BUILD_DIR}/rootfs
 
 # Output Dirs
-kOutDirSw := ${PROJ_OUTPUT_DIR}/sw
 kOutDirOs := ${PROJ_OUTPUT_DIR}/os
+kOutDirSw := ${PROJ_OUTPUT_DIR}/sw
+kOutDirRoootfs := ${PROJ_BUILD_DIR}/rootfs
 
 #########################
 # property for Compiler #
@@ -52,10 +54,13 @@ kUtilitiesTopPath := ${kSrcDir}/utilities
 #######################
 # property for rootfs #
 #######################
+kRootFsSwSrcsDir := ${kOutDirSw}
+kRootfsOutPath := 
+
+
 kRoootFSTarget := rootfs.img
 kRootFSTargetPath := ${kOutDirOsRootFS}/${kRoootFSTarget}
 
-kRootFSBuildScriptDir := ${kSrcDirOs}/rootfs
 kRootFSBuildArgs := \
 	ROOTFS_TARGET=${kRootFSTargetPath} \
 	BUILD_DIR=${kBuildDirOsRootFS} \
@@ -110,8 +115,15 @@ chk_env := $(foreach exec,$(necessary_exec_prog),\
 
 all: make_rootfs
 
-make_rootfs: build_sw 
-	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} 
+make_rootfs:
+	@rm -rf ${kBuildDirRoootfs}
+	@mkdir -p ${kBuildDirRoootfs}
+	@for i in `ls -d ${kRootFsSwSrcsDir}/*`; do \
+		cp -a $${i}/* ${kBuildDirRoootfs}; \
+	done	
+	mkimage -A arm -T ramdisk -c gzip -d 
+	
+
 
 build_os: 
 	${MAKE} -C ${kOsBuildScriptDir} ${kOsBuildArgs}
@@ -126,11 +138,11 @@ build_sw: build_os
 #########
 ################################################################################
 clean_rootfs:
-	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} clean
+	${MAKE} -C ${kRootFSBuildScriptDir} ${kRootFSBuildArgs} distclean
 clean_os: 
-	${MAKE} -C ${kOsBuildScriptDir} ${kOsBuildArgs} clean
+	${MAKE} -C ${kOsBuildScriptDir} ${kOsBuildArgs} distclean
 clean_sw:
-	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} clean
+	${MAKE} -C ${kSwBuildScriptDir} ${kSwBuildArgs} distclean
 
 distclean: \
 	clean_rootfs \

@@ -1,7 +1,9 @@
  # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
+
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -35,7 +37,7 @@ kCfgArgs := \
 ################################################################################
 
 kDeps := \
-	${kMKUtilitiesTopPath} 
+	${kUtilitiesTopPath} 
 
 ################################################################################
 # Run area below #
@@ -59,17 +61,11 @@ ${kTargetExecPath}: ${kDeps} clone_remote_zlib_src
 
 clone_remote_zlib_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
-	@if [ ! -d ${kZlibSrcLocalPath} ]; then \
-		echo "Remote repository doesn't exist in local, cloning...";\
-		git clone \
-		--depth=1 \
-		--branch=${kZlibSrcRemoteBranchTag} \
-		${kZlibSrcRemoteRepoUrl} ${kZlibSrcLocalPath}; \
-	else \
-		echo "Remote repository exist in local, check newest..."; \
-		cd ${kZlibSrcLocalPath}; \
-		git pull ${kZlibSrcRemoteRepoUrl}; \
-	fi	
+	$(call CloneRemoteRepo,\
+		${kZlibSrcRemoteRepoUrl},\
+		${kZlibSrcRemoteBranchTag},\
+		${kZlibSrcLocalPath},\
+	)
 
 clean: 
 	$(call InfoPrint,"Clean zlib build/out directories")

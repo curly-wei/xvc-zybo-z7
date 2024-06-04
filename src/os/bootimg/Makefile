@@ -1,7 +1,8 @@
  # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -42,7 +43,7 @@ kBootbifEnd := "}"
 
 ################################################################################
 
-kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+
 kDeps := \
 	${kMKUtilitiesTopPath} 
 

@@ -24,7 +24,7 @@ foreach iter ${requiredParameters} {
       $arg(B) { set kBuildDir $arg(${iter}) }\
       $arg(O) { set kOutputDir $arg(${iter}) }\
       $arg(t) { set kBDName $arg(${iter})}\
-      $arg(U) { set kTCLUtilitiesTopDir $arg(${iter}) }\
+      $arg(U) { set kTCLUtilitiesTopPath $arg(${iter}) }\
       $arg(f) { set kFPGAPart $arg(${iter}) }\
       $arg(v) { set kVerilogFiles $arg(${iter}) }\
       $arg(x) { set kXDCFiles $arg(${iter}) }\
@@ -33,10 +33,11 @@ foreach iter ${requiredParameters} {
       default { error "Input arguments error" }
   }
 }
-# include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/color_render.tcl
-# include NThreadsRunVivado
-source ${kTCLUtilitiesTopDir}/get_max_threads.tcl
+
+# Scan and Read-in tcl utilities
+foreach tcl_utility_files ${kTCLUtilitiesTopPath} {
+  source ${tcl_utility_files}
+}
 
 puts [InfoStr "---------------------------------------------"]
 puts [InfoStr "Run Vivado to build XVC HW"]

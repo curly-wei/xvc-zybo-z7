@@ -1,9 +1,10 @@
 PROJ_ROOT_DIR ?= $(shell realpath `pwd`/../../)
 
-# include utiluty
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}# include utiluty
 UTILITIES_TOP_DIR ?= $(shell realpath ${PROJ_ROOT_DIR}/src/utilities)
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
+
 
 
 #########################################################
@@ -178,20 +179,20 @@ kBusyboxBuildArgs := \
 	build_xvc_server \
 	build_busybox
 
-all: build_glibc build_openssh build_xvc_server
+all: build_openssh build_xvc_server
 build_glibc:
 	${MAKE} -C ${kGlibcBuildScriptDir} ${kGlibcBuildArgs} 
 
-build_zlib:
+build_zlib: build_glibc
 	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs}
 
-build_dropbear: build_zlib
+build_dropbear:
 	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
 
-build_openssh: #build_openssl
+build_openssh: build_openssl
 	${MAKE} -C ${kOpensshBuildScriptDir} ${kOpensshBuildArgs}
 
-build_openssl:
+build_openssl: build_zlib
 	${MAKE} -C ${kOpensslBuildScriptDir} ${kOpensslBuildArgs}
 
 build_xvc_server:
@@ -226,5 +227,7 @@ distclean: \
 	clean_glibc \
 	clean_zlib \
 	clean_dropbear \
+	clean_openssh \
+	clean_openssl \
 	clean_xvc_server \
 	clean_busybox

@@ -1,7 +1,8 @@
 # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -33,8 +34,8 @@ kXDCSrcsPath := \
 kTopBuildScriptPath := ${kScriptsDir}/${kTopBuildScript}
 kBuildScriptBDPath := ${kScriptsDir}/${kBuildScriptBD}
 kBuildScriptPSPresetPath := ${kScriptsDir}/${kBuildScriptPSPreset}
-kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
-kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+kTCLUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/tcl/*.tcl)
+
 
 kTarget := $(basename $(notdir ${HW_TARGET}))
 kTargetXSA := ${HW_TARGET}
@@ -64,7 +65,7 @@ kVivadoCLIArgs := \
 	-x "${kXDCSrcsPath}" \
 	-b ${kBuildScriptBDPath} \
 	-p ${kBuildScriptPSPresetPath} \
-	-U ${kTCLUtilitiesTopPath}
+	-U "${kTCLUtilitiesTopPath}"
 
 
 ################################################################################

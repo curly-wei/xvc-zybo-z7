@@ -1,8 +1,7 @@
 # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
-
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
-include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -40,6 +39,7 @@ kCfgArgs := \
 	--prefix=${kOutputDir}
 
 ################################################################################
+
 
 kDeps := \
 	${kMKUtilitiesTopPath} 

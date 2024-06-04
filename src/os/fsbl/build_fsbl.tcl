@@ -20,20 +20,17 @@ foreach iter ${requiredParameters} {
     switch $arg(${iter}) \
       $arg(B) { set kBuildDir $arg(${iter}) } \
       $arg(O) { set kOutputDir $arg(${iter}) } \
-      $arg(U) { set kTCLUtilitiesTopDir $arg(${iter}) } \
+      $arg(U) { set kTCLUtilitiesTopPath $arg(${iter}) } \
       $arg(t) { set kAPPName $arg(${iter})} \
       $arg(x) { set kXSAFilePath $arg(${iter}) } \
       default { error "Input arguments error" }
   }
 }
 
-
-# include ErrStr and InfoStr
-source ${kTCLUtilitiesTopDir}/color_render.tcl
-
-# include NThreadsRunVivado
-source ${kTCLUtilitiesTopDir}/get_max_threads.tcl
-set kMaxThreads [MaxThreads]
+# Scan and Read-in tcl utilities
+foreach tcl_utility_files ${kTCLUtilitiesTopPath} {
+  source ${tcl_utility_files}
+}
 
 puts [InfoStr "-----------------------------------------------"]
 puts [InfoStr "Run Vitist-XCST to build FSBL"]

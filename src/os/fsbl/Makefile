@@ -1,7 +1,8 @@
 # include utiluty
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -19,7 +20,7 @@ kBuildTCLScript := build_fsbl.tcl
 
 kBuildTCLScriptPath := ${kSrcsDir}/${kBuildTCLScript}
 
-kTCLUtilitiesTopPath := ${kUtilitiesTopPath}/tcl
+kTCLUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/tcl/*.tcl)
 
 kTarget := $(basename $(notdir ${FSBL_TARGET}))
 kTargetExec := $(notdir ${FSBL_TARGET})
@@ -35,7 +36,7 @@ kXsctCLIArgs := \
 	-B ${kBuildDir} \
 	-O ${kOutputDir} \
 	-t ${kTarget} \
-	-U ${kTCLUtilitiesTopPath} \
+	-U "${kTCLUtilitiesTopPath}" \
 	-x ${kXSASrcPath} 
 
 

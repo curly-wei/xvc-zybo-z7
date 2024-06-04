@@ -1,10 +1,12 @@
 # include utiluty
-kUtilitiesTopPath = ${UTILITIES_TOP_DIR}
+kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
+kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesTopPath}
 
-include ${kUtilitiesTopPath}/makefile/color_printer.mk
-include ${kUtilitiesTopPath}/makefile/clone_remote_repo.mk
+
 
 # I/O/B dir
+kSrcsDir := $(shell pwd)
 kBuildDir := ${BUILD_DIR}
 kOutputDir := ${OUTPUT_DIR}
 
@@ -32,7 +34,7 @@ kUImageGenPath := ${kUImageGenDir}/${kUImageGenFileName}
 
 ################################################################################
 
-kMKUtilitiesTopPath := ${kUtilitiesTopPath}/makefile
+
 kDeps := \
 	${kMKUtilitiesTopPath}
 
