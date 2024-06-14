@@ -1,9 +1,7 @@
  # include utiluty
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
-include ${kMKUtilitiesTopPath}
-
-
+kMKUtilitiesPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesPath}
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)

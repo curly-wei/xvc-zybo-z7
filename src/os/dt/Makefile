@@ -1,7 +1,7 @@
 # include utiluty
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
-include ${kMKUtilitiesTopPath}
+kMKUtilitiesPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesPath}
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -54,7 +54,7 @@ kTCLUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/tcl/*.tcl)
 
 kDepsBaseDT := \
 	${kXSASrcsPath} \
-	${kMKUtilitiesTopPath} \
+	${kMKUtilitiesPath} \
 	${kTCLUtilitiesTopPath}
 
 kDepsBuildDT := \

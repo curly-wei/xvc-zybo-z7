@@ -1,7 +1,7 @@
 # include utiluty
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-kMKUtilitiesTopPath := $(wildcard ${UTILITIES_TOP_DIR}/makefile/*.mk)
-include ${kMKUtilitiesTopPath}
+kMKUtilitiesPath := $(wildcard ${UTILITIES_TOP_DIR}/makefile/*.mk)
+include ${kMKUtilitiesPath}
 
 
 # I/O/B dir
@@ -46,7 +46,7 @@ kDeps := \
 	${kTopBuildScriptPath} \
 	${kBuildScriptBDPath} \
 	${kBuildScriptPSPresetPath} \
-	${kMKUtilitiesTopPath} \
+	${kMKUtilitiesPath} \
 	${kTCLUtilitiesTopPath}
 
 # Compiler

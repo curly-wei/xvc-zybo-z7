@@ -1,12 +1,10 @@
 # https://wiki.beyondlogic.org/index.php?title=Cross_Compiling_BusyBox_for_ARM#DropBear_.28Optional.29
 # ./configure --prefix=`pwd`/out --host=arm-linux-gnueabihf --with-zlib=../zlib/out  
-kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
-include ${kMKUtilitiesTopPath}
-# include utiluty
+
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-
-
-
+kMKUtilitiesPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+include ${kMKUtilitiesPath}
+# include utiluty
 
 # I/O/B dir
 kSrcsDir := $(shell pwd)
@@ -41,7 +39,7 @@ kCfgArgs := \
 ################################################################################
 
 kDeps := \
-	${kMKUtilitiesTopPath} 
+	${kMKUtilitiesPath} 
 
 ################################################################################
 # Run area below #

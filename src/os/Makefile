@@ -1,11 +1,10 @@
 PROJ_ROOT_DIR ?= $(shell realpath `pwd`/../../)
 
-kMKUtilitiesTopPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
-include ${kMKUtilitiesTopPath}# include utiluty
 UTILITIES_TOP_DIR ?= $(shell realpath ${PROJ_ROOT_DIR}/src/utilities)
 kUtilitiesTopPath := ${UTILITIES_TOP_DIR}
-
-
+kMKUtilitiesPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
+# include utiluty
+include ${kMKUtilitiesPath}
 
 #########################################################
       # Necessary properities, please check #
