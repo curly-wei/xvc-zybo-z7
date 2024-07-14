@@ -13,13 +13,13 @@ kOutputDir := ${OUTPUT_DIR}
 ## Please cheack here ##
 ########################
 
-kGlibcSrcRemoteRepoUrl := https://github.com/bminor/glibc
-kGlibcSrcRemoteBranchTag := master
-kGlibcSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
-kGlibcSrcLocalPath := ${kBuildDir}/${kGlibcSrcLocalDirName}
+kGccSrcRemoteRepoUrl := https://github.com/gcc-mirror/gcc
+kGccSrcRemoteBranchTag := master
+kGccSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
+kGccSrcLocalPath := ${kBuildDir}/${kGccSrcLocalDirName}
 
-kTarget := $(basename $(notdir ${SW_TARGET_GLIBC}))
-kTargetExec := $(notdir ${SW_TARGET_GLIBC})
+kTarget := $(basename $(notdir ${SW_TARGET_GCC}))
+kTargetExec := $(notdir ${SW_TARGET_GCC})
 kTargetExecPath := ${kOutputDir}/${kTargetExec}
 
 # Compiler
@@ -27,7 +27,7 @@ kCC := ${CROSS_COMPILE:-=}
 
 # cfg before make 
 kCfgArgs := \
-	${kGlibcSrcLocalPath}/configure \
+	${kGccSrcLocalPath}/configure \
 	--prefix=${kOutputDir} \
 	--build=$(shell uname -m) \
 	--enable-crypt \
@@ -44,27 +44,27 @@ kDeps := \
 
 .PHONY: \
 	all \
-	clone_remote_glibc_src \
+	clone_remote_gcc_src \
 	clean 
 #.NOTPARALLEL:
 
 all: ${kTargetExecPath}
-${kTargetExecPath}: ${kDeps} clone_remote_glibc_src 
-	$(call InfoPrint,"Start to build glibc")
+${kTargetExecPath}: ${kDeps} clone_remote_gcc_src 
+	$(call InfoPrint,"Start to build gcc")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
 	cd ${kBuildDir} && ${kCfgArgs}
 	${MAKE} -C ${kBuildDir}
 	${MAKE} -C ${kBuildDir} install
-	$(call InfoPrint,"Build glibc has been completed")
+	$(call InfoPrint,"Build gcc has been completed")
 
-clone_remote_glibc_src:
+clone_remote_gcc_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
 	$(call CloneRemoteRepo,\
-		${kGlibcSrcRemoteRepoUrl},\
-		${kGlibcSrcRemoteBranchTag},\
-		${kGlibcSrcLocalPath},\
+		${kGccSrcRemoteRepoUrl},\
+		${kGccSrcRemoteBranchTag},\
+		${kGccSrcLocalPath},\
 	)
 
 clean: 
-	$(call InfoPrint,"Clean glibc build/out directories")
+	$(call InfoPrint,"Clean gcc build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}

@@ -13,13 +13,13 @@ kOutputDir := ${OUTPUT_DIR}
 ## Please cheack here ##
 ########################
 
-kGlibcSrcRemoteRepoUrl := https://github.com/bminor/glibc
-kGlibcSrcRemoteBranchTag := master
-kGlibcSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
-kGlibcSrcLocalPath := ${kBuildDir}/${kGlibcSrcLocalDirName}
+KXcryptSrcRemoteRepoUrl := https://github.com/besser82/libxcrypt
+KXcryptSrcRemoteBranchTag := master
+KXcryptSrcLocalDirName := $(basename $(notdir ${kSrcsDir}))_src
+KXcryptSrcLocalPath := ${kBuildDir}/${KXcryptSrcLocalDirName}
 
-kTarget := $(basename $(notdir ${SW_TARGET_GLIBC}))
-kTargetExec := $(notdir ${SW_TARGET_GLIBC})
+kTarget := $(basename $(notdir ${SW_TARGET_XCRYPT}))
+kTargetExec := $(notdir ${SW_TARGET_XCRYPT})
 kTargetExecPath := ${kOutputDir}/${kTargetExec}
 
 # Compiler
@@ -27,10 +27,11 @@ kCC := ${CROSS_COMPILE:-=}
 
 # cfg before make 
 kCfgArgs := \
-	${kGlibcSrcLocalPath}/configure \
+	./configure \
 	--prefix=${kOutputDir} \
-	--build=$(shell uname -m) \
-	--enable-crypt \
+	--enable-hashes=strong,glibc \
+	--enable-obsolete-api=glibc \
+	--disable-failure-tokens \
 	--host=${kCC}
 
 ################################################################################
@@ -44,27 +45,27 @@ kDeps := \
 
 .PHONY: \
 	all \
-	clone_remote_glibc_src \
+	clone_remote_xcrypt_src \
 	clean 
 #.NOTPARALLEL:
 
 all: ${kTargetExecPath}
-${kTargetExecPath}: ${kDeps} clone_remote_glibc_src 
-	$(call InfoPrint,"Start to build glibc")
+${kTargetExecPath}: ${kDeps} clone_remote_xcrypt_src 
+	$(call InfoPrint,"Start to build xcrypt")
 	mkdir -p ${kBuildDir} ${kOutputDir} 
-	cd ${kBuildDir} && ${kCfgArgs}
-	${MAKE} -C ${kBuildDir}
-	${MAKE} -C ${kBuildDir} install
-	$(call InfoPrint,"Build glibc has been completed")
+	cd ${KXcryptSrcLocalPath} && ./autogen.sh && ${kCfgArgs}
+	${MAKE} -C ${KXcryptSrcLocalPath}
+	${MAKE} -C ${KXcryptSrcLocalPath} install
+	$(call InfoPrint,"Build xcrypt has been completed")
 
-clone_remote_glibc_src:
+clone_remote_xcrypt_src:
 	$(call InfoPrint,"Check Remote/Local Repository...")
 	$(call CloneRemoteRepo,\
-		${kGlibcSrcRemoteRepoUrl},\
-		${kGlibcSrcRemoteBranchTag},\
-		${kGlibcSrcLocalPath},\
+		${KXcryptSrcRemoteRepoUrl},\
+		${KXcryptSrcRemoteBranchTag},\
+		${KXcryptSrcLocalPath},\
 	)
 
 clean: 
-	$(call InfoPrint,"Clean glibc build/out directories")
+	$(call InfoPrint,"Clean xcrypt build/out directories")
 	rm -rf ${kBuildDir} ${kOutputDir}

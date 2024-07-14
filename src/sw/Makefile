@@ -6,8 +6,6 @@ kMKUtilitiesPath := $(wildcard ${kUtilitiesTopPath}/makefile/*.mk)
 # include utiluty
 include ${kMKUtilitiesPath}
 
-
-
 #########################################################
       # Necessary properities #
 #########################################################
@@ -31,6 +29,7 @@ kArch := ${ARCH}
 # Build Dir
 kBuildDirSwGlibc:= ${kBuildDirSw}/build_glibc
 kBuildDirSwZlib := ${kBuildDirSw}/build_zlib
+kBuildDirSwXcrypt := ${kBuildDirSw}/build_xcrypt
 kBuildDirSwDropbear := ${kBuildDirSw}/build_dropbear
 kBuildDirSwOpenssh := ${kBuildDirSw}/build_openssh
 kBuildDirSwOpenssl := ${kBuildDirSw}/build_openssl
@@ -41,6 +40,7 @@ kBuildDirSwOsBusybox := ${kBuildDirSw}/build_busybox
 # Output Dir
 kOutDirSwGlibc := ${kOutDirSw}/glibc
 kOutDirSwZlib := ${kOutDirSw}/zlib
+kOutDirSwXcrypt := ${kOutDirSw}/xcrypt
 kOutDirSwDropbear := ${kOutDirSw}/dropbear
 kOutDirSwOpenssh := ${kOutDirSw}/openssh
 kOutDirSwOpenssl := ${kOutDirSw}/openssl
@@ -76,6 +76,21 @@ kZlibBuildArgs := \
 	SW_TARGET_ZLIB=${kZlibTargetPath} \
 	BUILD_DIR=${kBuildDirSwZlib} \
 	OUTPUT_DIR=${kOutDirSwZlib} \
+	CROSS_COMPILE=${kCC} \
+	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
+
+
+###############################
+# property for build xcrypt #
+##############################
+kXcryptTarget := libcrypt.so
+kXcryptTargetPath := ${kOutDirSwXcrypt}/lib/${kXcryptTarget}
+
+kXcryptBuildScriptDir := ${kSrcDirSw}/xcrypt
+kXcryptBuildArgs := \
+	SW_TARGET_ZLIB=${kXcryptTargetPath} \
+	BUILD_DIR=${kBuildDirSwXcrypt} \
+	OUTPUT_DIR=${kOutDirSwXcrypt} \
 	CROSS_COMPILE=${kCC} \
 	UTILITIES_TOP_DIR=${kUtilitiesTopPath}
 
@@ -166,6 +181,7 @@ kBusyboxBuildArgs := \
 	distclean \
 	clean_glibc \
 	clean_zlib \
+	clean_xcrypt \
 	clean_dropbear \
 	clean_openssh \
 	clean_openssl \
@@ -174,6 +190,7 @@ kBusyboxBuildArgs := \
 	all \
 	build_glibc \
 	build_zlib \
+	build_xcrypt \
 	build_dropbear \
 	build_openssh \
 	build_openssl \
@@ -186,6 +203,9 @@ build_glibc:
 
 build_zlib: build_glibc
 	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs}
+
+build_xcrypt: 
+	${MAKE} -C ${kXcryptBuildScriptDir} ${kXcryptBuildArgs}
 
 build_dropbear:
 	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs}
@@ -212,6 +232,8 @@ clean_glibc:
 	${MAKE} -C ${kGlibcBuildScriptDir} ${kGlibcBuildArgs} clean
 clean_zlib:
 	${MAKE} -C ${kZlibBuildScriptDir} ${kZlibBuildArgs} clean
+clean_xcrypt: 
+	${MAKE} -C ${kXcryptBuildScriptDir} ${kXcryptBuildArgs} clean
 clean_dropbear:
 	${MAKE} -C ${kDropbearBuildScriptDir} ${kDropbearBuildArgs} clean
 clean_openssh:
@@ -227,6 +249,7 @@ clean_busybox:
 distclean: \
 	clean_glibc \
 	clean_zlib \
+	clean_xcrypt \
 	clean_dropbear \
 	clean_openssh \
 	clean_openssl \
